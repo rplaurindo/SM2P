@@ -12,7 +12,7 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
 
     private $header = array(
         'To' => '',
-        'Content-Type' => 'text/html'
+        'Content-Type' => 'text/html; charset=UTF-8'
     );
 
     function __construct($server, $port, $sender, array $options = []) {
@@ -61,7 +61,7 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
     }
 
     protected function sendBody() {
-    	$this->sendCommand(PHP_EOL . utf8_decode($this->body));
+    	$this->sendCommand(PHP_EOL . $this->body);
         return $this->sendCommand('.');
     }
 
