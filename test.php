@@ -17,8 +17,6 @@ $strategy->addTo('', '');
 $strategy->setSubject('subject test');
 $strategy->setBody('<b>body test</b>');
 
-echo 'email sent: ' . $smtpStrategyContext->send();
-
 if ($smtpStrategyContext->send()) {
     echo 'email sent.';
 } else {
