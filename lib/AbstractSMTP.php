@@ -22,6 +22,7 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
 
         $this->server = $server;
         $this->setLogin($sender);
+        $this->setFrom($sender);
     	$this->sender = "MAIL FROM:<$sender>";
     }
 
@@ -29,7 +30,11 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
 
     function addTo($recipient, $name = '') {
     	$this->header['To'] .= ($name ? "$name " : "") . "<$recipient>, ";
-    	$this->setRecipient($recipient);
+        $this->setRecipient($recipient);
+    }
+
+    function setFrom($sender, $name = '') {
+        $this->header['From'] = ($name ? $name : "") . "<$sender>";
     }
 
     function setSubject($subject) {
@@ -45,13 +50,17 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
     }
 
     protected function sendSender() {
-    	$this->sendCommand($this->sender);
+    	return $this->sendCommand($this->sender);
     }
 
     protected function sendRecipients() {
+        global $responses;
+        $responses = [];
         array_walk($this->recipients, function($r) {
-            $this->sendCommand($r);
+            global $responses;
+            array_push($responses, $this->sendCommand($r));
         });
+        return implode("", $responses);
     }
 
     protected function sendHeader() {

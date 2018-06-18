@@ -2,11 +2,9 @@
 
 namespace SM2P\SMTP;
 
-use AbstractSMTP;
+use SM2P\AbstractSMTP;
 
 class OutlookStrategy extends AbstractSMTP {
-
-    private $smtp;
 
     function __construct($sender, array $options = []) {
         parent::__construct('smtp-mail.outlook.com', 587, $sender, $options);
@@ -16,6 +14,7 @@ class OutlookStrategy extends AbstractSMTP {
         $sent = false;
 
         $this->sendEHLO();
+
         $this->sendSTARTTLS();
         $this->encryptConnection();
         $this->sendEHLO();
@@ -24,7 +23,8 @@ class OutlookStrategy extends AbstractSMTP {
         $this->sendSender();
         $this->sendRecipients();
         $this->sendHeader();
-        if ($this->sendBody() == '250') {
+        $this->sendBody();
+        if ($this->getResponseCode() == '250') {
             $sent = true;
         }
         $this->sendQUIT();

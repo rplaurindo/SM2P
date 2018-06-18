@@ -8,6 +8,7 @@ abstract class AbstractMailProtocol {
     private $password;
 
     private $socket;
+    private $lines;
     private $bufferSize = 120;
     private $timeout = 10;
 
@@ -21,9 +22,10 @@ abstract class AbstractMailProtocol {
         }
     }
 
-    function sendCommand($command) {
+    protected function sendCommand($command) {
     	fputs($this->socket, $command . PHP_EOL, $this->bufferSize);
-        return $this->getResponseCode();
+        $this->eachLine();
+        return $this->lines;
     }
 
     function sendSTARTTLS() {
@@ -58,11 +60,16 @@ abstract class AbstractMailProtocol {
 
     function sendQUIT() {
         fputs($this->socket, 'QUIT' . PHP_EOL, $this->bufferSize);
-        return $this->extractResponseCodeFrom($this->getResponse());
+        return $this->getResponse();
     }
 
     function closeConnection() {
         fclose($this->socket);
+    }
+
+    private function getResponse() {
+        $this->lines = fgets($this->socket, $this->bufferSize);
+        return $this->lines;
     }
 
     private function resolveOptions(array $options) {
@@ -76,26 +83,23 @@ abstract class AbstractMailProtocol {
     }
 
     private function eachLine() {
-        $lines = '';
+        $lines = [];
+
         do {
             stream_set_timeout($this->socket, 1);
             $serverResponse = $this->getResponse();
-            $lines .= $serverResponse;
+            array_push($lines, $serverResponse);
         } while ($serverResponse !== false);
 
-        return $lines;
+        array_pop($lines);
+        $this->lines = implode("", $lines);
     }
 
-    private function extractResponseCodeFrom($response) {
-        return substr($response, 0, 3);
-    }
-
-    private function getResponseCode() {
-        return $this->extractResponseCodeFrom($this->eachLine());
-    }
-
-    private function getResponse() {
-        return fgets($this->socket, $this->bufferSize);
+    function getResponseCode() {
+        if ($this->lines[3] == " ") {
+            return substr($this->lines, 0, 3);
+        }
+        return null;
     }
 
 }
