@@ -1,5 +1,7 @@
 <?php
 
+namespace SM2P;
+
 abstract class AbstractMailProtocol {
 
     private $login;
@@ -15,7 +17,7 @@ abstract class AbstractMailProtocol {
         $this->eachLine();
 
         if ($errNum) {
-            throw new Exception("$errNum error: $errstr." );
+            throw new Exception("$errNum error: $errStr." );
         }
     }
 

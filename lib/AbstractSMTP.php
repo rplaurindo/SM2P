@@ -1,5 +1,7 @@
 <?php
 
+namespace SM2P;
+
 abstract class AbstractSMTP extends AbstractMailProtocol {
 
     private $server;

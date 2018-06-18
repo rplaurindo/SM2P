@@ -1,5 +1,7 @@
 <?php
 
+namespace SM2P;
+
 class SMTPStrategyContext {
 
 	private $strategy;

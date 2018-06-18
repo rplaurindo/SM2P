@@ -1,0 +1,22 @@
+{
+  "name": "sm2p",
+  "version": "1.0.0",
+  "homepage": "https://github.com/rplaurindo/sm2p",
+  "description": "",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rafael Laurindo",
+      "email": "rafaelplaurindo@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "SM2P\\": [
+        "src/SM2P/",
+        "lib/"
+      ]
+    }
+  }
+}
