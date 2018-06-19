@@ -83,20 +83,19 @@ abstract class AbstractMailProtocol {
     }
 
     private function eachLine() {
-        $lines = [];
+        $lines = '';
 
         do {
             stream_set_timeout($this->socket, 1);
             $serverResponse = $this->getResponse();
-            array_push($lines, $serverResponse);
+            $lines .= $serverResponse;
         } while ($serverResponse !== false);
 
-        array_pop($lines);
-        $this->lines = implode("", $lines);
+        $this->lines = $lines;
     }
 
     function getResponseCode() {
-        if ($this->lines[3] == " ") {
+        if (strlen($this->lines) >= 4 && $this->lines[3] == " ") {
             return substr($this->lines, 0, 3);
         }
         return null;
