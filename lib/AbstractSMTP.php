@@ -22,8 +22,8 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
 
         $this->server = $server;
         $this->setLogin($sender);
+        $this->sender = "MAIL FROM:<$sender>";
         $this->setFrom($sender);
-    	$this->sender = "MAIL FROM:<$sender>";
     }
 
     abstract function send();
