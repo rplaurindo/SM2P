@@ -46,7 +46,7 @@ abstract class AbstractSMTP extends AbstractMailProtocol {
     }
 
     protected function sendEHLO() {
-    	return $this->sendCommand("EHLO $this->server");
+        return $this->sendCommand("EHLO $this->server", true);
     }
 
     protected function sendSender() {

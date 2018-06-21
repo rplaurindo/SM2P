@@ -9,23 +9,26 @@ abstract class AbstractMailProtocol {
 
     private $socket;
     private $lines;
-    private $bufferSize = 120;
     private $timeout = 10;
 
     function __construct($server, $port, array $options = []) {
         $this->resolveOptions($options);
         $this->socket = @fsockopen($server, $port, $errNum, $errStr, $this->timeout);
-        $this->eachLine();
+        $this->getResponse();
 
         if ($errNum) {
             throw new Exception("$errNum error: $errStr." );
         }
     }
 
-    protected function sendCommand($command) {
-    	fputs($this->socket, $command . PHP_EOL, $this->bufferSize);
-        $this->eachLine();
-        return $this->lines;
+    protected function sendCommand($command, $hasManyLines = false) {
+        fputs($this->socket, $command . PHP_EOL);
+        if ($hasManyLines) {
+            $this->eachLine();
+            return $this->lines;
+        }
+
+        return $this->getResponse();
     }
 
     function sendSTARTTLS() {
@@ -34,7 +37,7 @@ abstract class AbstractMailProtocol {
 
     function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
         stream_socket_enable_crypto($this->socket, true, $cryptoType);
-        $this->eachLine();
+        $this->getResponse();
     }
 
     function setLogin($login) {
@@ -59,8 +62,7 @@ abstract class AbstractMailProtocol {
     // }
 
     function sendQUIT() {
-        fputs($this->socket, 'QUIT' . PHP_EOL, $this->bufferSize);
-        return $this->getResponse();
+        return $this->sendCommand('QUIT');
     }
 
     function closeConnection() {
@@ -68,15 +70,11 @@ abstract class AbstractMailProtocol {
     }
 
     private function getResponse() {
-        $this->lines = fgets($this->socket, $this->bufferSize);
+        $this->lines = fgets($this->socket);
         return $this->lines;
     }
 
     private function resolveOptions(array $options) {
-        if (isset($options['bufferSize'])) {
-            $this->bufferSize = $options['bufferSize'];
-        }
-
         if (isset($options['timeout'])) {
             $this->timeout = $options['timeout'];
         }

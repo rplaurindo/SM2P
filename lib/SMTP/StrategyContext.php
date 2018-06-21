@@ -1,8 +1,10 @@
 <?php
 
-namespace SM2P;
+namespace SM2P\SMTP;
 
-class SMTPStrategyContext {
+use SM2P\AbstractSMTP;
+
+class StrategyContext {
 
 	private $strategy;
 
