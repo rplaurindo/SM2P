@@ -29,8 +29,10 @@ abstract class AbstractGraphSearch implements Iterator {
     private $i;
     private $lastIndex;
     private $keys;
+    private $ordered2Stop;
 
     function __construct(array $collection) {
+        $this->ordered2Stop = false;
         $this->queue = $collection;
         $this->nextQueue = array();
     }
@@ -43,17 +45,19 @@ abstract class AbstractGraphSearch implements Iterator {
     }
 
     function rewind() {
-        $this->i = 0;
         $this->keys = array_keys($this->queue);
-        $this->lastIndex = count($this->keys) - 1;
+        if (!$this->ordered2Stop) {
+            $this->i = 0;
+            $this->lastIndex = count($this->keys) - 1;
+        }
     }
 
     function valid() {
-//        echo 'call valid' . "\n";
         return $this->i <= $this->lastIndex;
     }
 
     function current() {
+
         if ($this->valid()) {
             $current = $this->queue[$this->key()];
         } else {
@@ -68,22 +72,23 @@ abstract class AbstractGraphSearch implements Iterator {
     }
 
     function next() {
-        $key = $this->keys[$this->i++];
-        $item = $this->queue[$key];
+        $this->i++;
 
         if (!$this->valid()) {
-            if ($this->hasNextQueue()) {
+            if (!$this->ordered2Stop && $this->hasNextQueue()) {
                 $this->rewind();
             }
+        } else {
+            $key = $this->keys[$this->i];
+            $item = $this->queue[$key];
+            return $item;
         }
-
-        return $item;
     }
 
-//    function stop() {
-//        $this->i = $this->lastIndex + 1;
-////        $this->i = $this->lastIndex;
-//    }
+    function stop() {
+        $this->ordered2Stop = true;
+        $this->i = $this->lastIndex + 1;
+    }
 
     private function putOnNextQueue($collection) {
         $keys = array_keys($collection);
@@ -139,4 +144,5 @@ foreach ($bfsArray as $key => $value) {
     echo 'key: ' . $key . "\n";
     echo 'value: ' . json_encode($value) . "\n";
 //    $bfsArray->stop();
+//    break;
 }
