@@ -85,7 +85,7 @@ abstract class AbstractGraphSearch implements Iterator {
         }
     }
 
-    function stop() {
+    function stopAtNext() {
         $this->ordered2Stop = true;
         $this->i = $this->lastIndex + 1;
     }
@@ -140,9 +140,10 @@ class BFSArray extends AbstractGraphSearch {
 
 $bfsArray = new BFSArray($arr);
 
+//$bfsArray->stopAtNext();
 foreach ($bfsArray as $key => $value) {
     echo 'key: ' . $key . "\n";
     echo 'value: ' . json_encode($value) . "\n";
-//    $bfsArray->stop();
+//    $bfsArray->stopAtNext();
 //    break;
 }
