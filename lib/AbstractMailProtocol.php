@@ -14,11 +14,12 @@ abstract class AbstractMailProtocol {
     function __construct($server, $port, array $options = []) {
         $this->resolveOptions($options);
         $this->socket = @fsockopen($server, $port, $errNum, $errStr, $this->timeout);
-        $this->getResponse();
 
         if ($errNum) {
             throw new Exception("$errNum error: $errStr." );
         }
+
+        $this->getResponse();
     }
 
     protected function sendCommand($command, $hasManyLines = false) {
