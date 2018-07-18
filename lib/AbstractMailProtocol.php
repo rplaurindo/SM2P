@@ -27,19 +27,6 @@ abstract class AbstractMailProtocol {
         }
     }
 
-    function setLogin($login) {
-        $this->login = $login;
-    }
-
-    function setPassword($password) {
-        $this->password = $password;
-    }
-
-    function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
-        stream_socket_enable_crypto($this->socket, true, $cryptoType);
-        $this->getResponse();
-    }
-
     function sendSTARTTLS() {
     	return $this->sendCommand('STARTTLS');
     }
@@ -61,8 +48,17 @@ abstract class AbstractMailProtocol {
         return $this->sendCommand('QUIT');
     }
 
-    function closeConnection() {
-        fclose($this->socket);
+    function setLogin($login) {
+        $this->login = $login;
+    }
+
+    function setPassword($password) {
+        $this->password = $password;
+    }
+
+    function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
+        stream_socket_enable_crypto($this->socket, true, $cryptoType);
+        $this->getResponse();
     }
 
     function getResponseCode() {
@@ -70,6 +66,10 @@ abstract class AbstractMailProtocol {
             return substr($this->lines, 0, 3);
         }
         return null;
+    }
+
+    function closeConnection() {
+        fclose($this->socket);
     }
 
     protected function sendCommand($command, $hasManyLines = false) {
@@ -82,15 +82,15 @@ abstract class AbstractMailProtocol {
         return $this->getResponse();
     }
 
-    private function getResponse() {
-        $this->lines = fgets($this->socket);
-        return $this->lines;
-    }
-
     private function resolveOptions(array $options) {
         if (isset($options['timeout'])) {
             $this->timeout = $options['timeout'];
         }
+    }
+
+    private function getResponse() {
+        $this->lines = fgets($this->socket);
+        return $this->lines;
     }
 
     private function eachLine() {
