@@ -4,12 +4,13 @@ namespace SM2P;
 
 use Exception;
 
-abstract class AbstractMailProtocol {
+class MailProtocolReceiver {
 
     private $login;
     private $password;
 
     private $socket;
+    private $server;
     private $lines;
     private $timeout = 10;
 
@@ -21,31 +22,22 @@ abstract class AbstractMailProtocol {
             if ($errNum) {
                 throw new Exception($errStr);
             }
+            $this->server = $server;
             $this->getResponse();
         } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
 
-    function sendSTARTTLS() {
-    	return $this->sendCommand('STARTTLS');
-    }
+//    action
+    function sendCommand($command, $hasManyLines = false) {
+        fputs($this->socket, $command . PHP_EOL);
+        if ($hasManyLines) {
+            $this->eachLine();
+            return $this->lines;
+        }
 
-    function sendLogin() {
-        return $this->sendCommand('AUTH LOGIN ' . base64_encode($this->login));
-    }
-
-    function sendPassword() {
-        return $this->sendCommand(base64_encode($this->password));
-    }
-
-    // function sendPlainAuth($user, $password) {
-    // 	return $this->sendCommand('AUTH PLAIN ' .
-    //         base64_encode("\\0$user\\0$password"));
-    // }
-
-    function sendQUIT() {
-        return $this->sendCommand('QUIT');
+        return $this->getResponse();
     }
 
     function setLogin($login) {
@@ -61,6 +53,10 @@ abstract class AbstractMailProtocol {
         $this->getResponse();
     }
 
+    function closeConnection() {
+        fclose($this->socket);
+    }
+
     function getResponseCode() {
         if (strlen($this->lines) >= 4 && $this->lines[3] == " ") {
             return substr($this->lines, 0, 3);
@@ -68,18 +64,8 @@ abstract class AbstractMailProtocol {
         return null;
     }
 
-    function closeConnection() {
-        fclose($this->socket);
-    }
-
-    protected function sendCommand($command, $hasManyLines = false) {
-        fputs($this->socket, $command . PHP_EOL);
-        if ($hasManyLines) {
-            $this->eachLine();
-            return $this->lines;
-        }
-
-        return $this->getResponse();
+    function getServer() {
+        return $this->server;
     }
 
     private function resolveOptions(array $options) {
