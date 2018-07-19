@@ -4,6 +4,7 @@ namespace SM2P\Commands\Mail;
 
 use SM2P;
 
+// Concrete Command
 class LoginCommand extends SM2P\AbstractMailProtocolCommand {
 
     private $login;
