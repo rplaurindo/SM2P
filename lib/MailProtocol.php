@@ -4,7 +4,7 @@ namespace SM2P;
 
 use Exception;
 
-class MailProtocolReceiver {
+class MailProtocol extends AbstractElement {
 
     private $login;
     private $password;
@@ -27,6 +27,10 @@ class MailProtocolReceiver {
         } catch (Exception $e) {
             echo $e->getMessage();
         }
+    }
+
+    function accept(AbstractMailProtocolVisitor $visitor) {
+        $visitor->visit($this);
     }
 
 //    action

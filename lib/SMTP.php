@@ -1,10 +1,9 @@
 <?php
 
-namespace SM2P\SMTP;
+namespace SM2P;
 
-use SM2P;
-
-class Receiver extends SM2P\MailProtocolReceiver {
+// Concrete Element
+class SMTP extends MailProtocol {
 
     private $sender;
     // private $cc;
