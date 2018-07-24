@@ -66,7 +66,7 @@ class Streaming extends AbstractElement {
         }
     }
 
-    protected function getResponse() {
+    private function getResponse() {
         $this->lines = fgets($this->socket);
         return $this->lines;
     }
