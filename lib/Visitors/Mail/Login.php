@@ -14,7 +14,7 @@ class Login implements SM2P\AbstractMailProtocolVisitor  {
     }
 
     function visit(SM2P\MailProtocol $element) {
-        $element->sendCommand('AUTH LOGIN ' . base64_encode($this->login));
+        return $element->sendCommand('AUTH LOGIN ' . base64_encode($this->login));
     }
 
 }
