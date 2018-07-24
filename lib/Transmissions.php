@@ -2,6 +2,7 @@
 
 namespace SM2P;
 
+//Object Structure
 class Transmissions {
 
     protected $elements;
