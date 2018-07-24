@@ -1,6 +1,6 @@
 <?php
 
-namespace SM2P\Commands\SMTP;
+namespace SM2P\Visitors\SMTP;
 
 use SM2P;
 

@@ -3,7 +3,9 @@
 namespace SM2P\Clients\SMTP;
 
 use SM2P;
-use SM2P\Visitors;
+use SM2P\Visitors\Streaming;
+use SM2P\Visitors\Mail;
+use SM2P\Visitors\SMTP;
 
 // Client
 class SeSeg extends SM2P\SMTP {
@@ -13,7 +15,7 @@ class SeSeg extends SM2P\SMTP {
     function __construct($sender, array $options = []) {
         parent::__construct('mail.seseg.rj.gov.br', 25, $sender, $options);
 
-        $this->commands = new SM2P\MailProtocols();
+        $this->commands = new SM2P\Transmissions();
 
         $this->commands->add($this);
     }
@@ -21,8 +23,7 @@ class SeSeg extends SM2P\SMTP {
     function send() {
 //        $sent = false;
 
-        $this->commands->accepts2EachMailProtocol(new Visitors\Mail\Login($this));
-
+        $this->commands->accepts2Each(new SMTP\EHLO());
 //        $this->commandInvoker->send('EHLO');
 //        $this->commandInvoker->send('SENDER');
 //        $this->commandInvoker->send('RECIPIENTS');

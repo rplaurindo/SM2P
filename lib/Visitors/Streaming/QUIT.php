@@ -1,6 +1,6 @@
 <?php
 
-namespace SM2P\Commands\Streaming;
+namespace SM2P\Visitors\Streaming;
 
 use SM2P;
 

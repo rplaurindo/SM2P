@@ -2,9 +2,9 @@
 
 namespace SM2P;
 
-class MailProtocols {
+class Transmissions {
 
-    private $elements;
+    protected $elements;
 
     function __construct() {
         $this->elements = [];
@@ -15,7 +15,7 @@ class MailProtocols {
     }
 
 //    accept
-    function accepts2EachMailProtocol(AbstractMailProtocolVisitor $visitor) {
+    function accepts2Each(AbstractVisitor $visitor) {
         foreach ($this->elements as $element) {
             $element->accept($visitor);
         }

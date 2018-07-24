@@ -2,7 +2,8 @@
 
 namespace SM2P;
 
-interface AbstractSMTPVisitor {
+//interface AbstractSMTPVisitor extends AbstractMailProtocolVisitor {
+interface AbstractSMTPVisitor extends AbstractVisitor {
 
     function visit(SMTP $element);
 
