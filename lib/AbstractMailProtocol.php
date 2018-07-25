@@ -2,7 +2,7 @@
 
 namespace SM2P;
 
-class MailProtocol extends Streaming {
+abstract class AbstractMailProtocol extends Streaming {
 
     private $login;
     private $password;

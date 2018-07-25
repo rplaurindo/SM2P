@@ -4,7 +4,7 @@ namespace SM2P\Visitors\Mail;
 
 use SM2P;
 
-class Password implements SM2P\AbstractMailProtocolVisitor {
+class Password implements SM2P\AbstractVisitor {
 
     private $password;
 
@@ -12,7 +12,7 @@ class Password implements SM2P\AbstractMailProtocolVisitor {
         $this->password = $password;
     }
 
-    function visit(SM2P\MailProtocol $element) {
+    function visit(SM2P\Streaming $element) {
         return $element->sendCommand(base64_encode($this->password));
     }
 

@@ -21,23 +21,17 @@ class SeSeg extends SM2P\SMTP {
     function send() {
         $sent = false;
 
-        $this->commands->accepts2Each(new SMTP\EHLO());
-//        $this->commandInvoker->send('EHLO');
-        $this->commands->accepts2Each(new SMTP\Sender());
-//        $this->commandInvoker->send('SENDER');
-        $this->commands->accepts2Each(new SMTP\Recipients());
-//        $this->commandInvoker->send('RECIPIENTS');
-        $this->commands->accepts2Each(new SMTP\Header());
-//        $this->commandInvoker->send('HEADER');
-//
-        $this->commands->accepts2Each(new SMTP\Body());
-//        $this->commandInvoker->send('BODY');
+        $this->commands->accepts2Each(new SMTP\EHLO($this));
+        $this->commands->accepts2Each(new SMTP\Sender($this));
+        $this->commands->accepts2Each(new SMTP\Recipients($this));
+        $this->commands->accepts2Each(new SMTP\Header($this));
+
+        $this->commands->accepts2Each(new SMTP\Body($this));
         if ($this->getResponseCode() == '250') {
             $sent = true;
         }
 
         $this->commands->accepts2Each(new Streaming\QUIT());
-//        $this->commandInvoker->send('QUIT');
 
         $this->closeConnection();
         if ($sent) {

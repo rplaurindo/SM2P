@@ -4,10 +4,10 @@ namespace SM2P\Visitors\SMTP;
 
 use SM2P;
 
-class Body implements SM2P\AbstractSMTPVisitor {
+class Body extends AbstractSMTP implements SM2P\AbstractVisitor {
 
-    function visit(SM2P\SMTP $element) {
-        $element->sendCommand(PHP_EOL . $element->getBody());
+    function visit(SM2P\Streaming $element) {
+        $element->sendCommand(PHP_EOL . $this->smtp->getBody());
         return $element->sendCommand('.');
     }
 

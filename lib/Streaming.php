@@ -26,7 +26,7 @@ class Streaming extends AbstractElement {
         }
     }
 
-    function accept(AbstractStreamingVisitor $visitor) {
+    function accept(AbstractVisitor $visitor) {
         $visitor->visit($this);
     }
 

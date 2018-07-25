@@ -3,7 +3,7 @@
 namespace SM2P;
 
 // Concrete Element
-class SMTP extends MailProtocol {
+class SMTP extends AbstractMailProtocol {
 
     private $sender;
     // private $cc;

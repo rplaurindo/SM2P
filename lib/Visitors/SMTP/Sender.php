@@ -4,10 +4,10 @@ namespace SM2P\Visitors\SMTP;
 
 use SM2P;
 
-class Sender implements SM2P\AbstractSMTPVisitor {
+class Sender extends AbstractSMTP implements SM2P\AbstractVisitor {
 
-    function visit(SM2P\SMTP $element) {
-        return $element->sendCommand($element->getSender());
+    function visit(SM2P\Streaming $element) {
+        return $element->sendCommand($this->smtp->getSender());
     }
 
 }

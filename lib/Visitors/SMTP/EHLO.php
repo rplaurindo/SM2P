@@ -4,10 +4,12 @@ namespace SM2P\Visitors\SMTP;
 
 use SM2P;
 
-class EHLO implements SM2P\AbstractSMTPVisitor {
+// Concrete Visitor
+class EHLO extends AbstractSMTP implements SM2P\AbstractVisitor {
 
-    function visit(SM2P\SMTP $element) {
-        return $element->sendCommand("EHLO {$element->getServer()}", true);
+//    overriding (should have same signature and inherited are not accepted as type). For overloading must be in the same class
+    function visit(SM2P\Streaming $element) {
+        return $element->sendCommand("EHLO {$this->smtp->getServer()}", true);
     }
 
 }
