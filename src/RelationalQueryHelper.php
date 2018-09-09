@@ -10,10 +10,6 @@ class RelationalQueryHelper {
     
     private $where;
     
-    private $tableDescription;
-    
-    private $relatedTableDescription;
-    
     private $table;
     
     private $PK;
@@ -33,9 +29,6 @@ class RelationalQueryHelper {
         $this->from = [];
         $this->where = [];
         
-        $this->tableDescription = $tableDescription;
-        $this->relatedTableDescription = $relatedTableDescription;
-        
         if (array_key_exists('name', $tableDescription)) {
             $this->table = $tableDescription['name'];
         }
@@ -54,14 +47,18 @@ class RelationalQueryHelper {
 
     }
 
-    function getAssociativeMap($associativeTable, $data) {
+    function getAssociativeMap(array $associativeTableDescription, array $data) {
         
-        if (array_key_exists('associativeKey', $this->tableDescription)) {
-            $associativeTableKey = $this->tableDescription['associativeKey'];
+        if (array_key_exists('name', $associativeTableDescription)) {
+            $associativeTable = $associativeTableDescription['name'];
         }
         
-        if (array_key_exists('associativeKey', $this->relatedTableDescription)) {
-            $associativeRelatedTableKey = $this->relatedTableDescription['associativeKey'];
+        if (array_key_exists($this->table, $associativeTableDescription)) {
+            $associativeTableKey = $associativeTableDescription[$this->table];
+        }
+        
+        if (array_key_exists($this->relatedTable, $associativeTableDescription)) {
+            $associativeRelatedTableKey = $associativeTableDescription[$this->relatedTable];
         }
         
         array_push($this->from, "$associativeTable");
@@ -87,14 +84,12 @@ class RelationalQueryHelper {
 
 $tableDescription = [
     'name' => 'ocorrencias',
-    'primaryKey' => 'id',
-    'associativeKey' => 'ocorrencia_id'
+    'primaryKey' => 'id'
 ];
 
 $relatedTableDescription = [
     'name' => 'boletins_de_ocorrencias',
-    'primaryKey' => 'id',
-    'associativeKey' => 'boletin_de_ocorrencia_id'
+    'primaryKey' => 'id'
 ];
 
 // array associativo montado automaticamente pelo Angular
@@ -102,5 +97,12 @@ $data = [
     'ocorrencia_id' => 2
 ];
 
-$associativeQueryHelper = new RelationalQueryHelper($tableDescription, $relatedTableDescription);
-print_r($associativeQueryHelper->getAssociativeMap('boletins_ocorrencias', $data, 'ocorrencia_id'));
+$relationalQueryHelper = new RelationalQueryHelper($tableDescription, $relatedTableDescription);
+
+$associativeTableDescription = [
+    'name' => 'boletins_ocorrencias',
+    'ocorrencias' => 'ocorrencia_id',
+    'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
+];
+
+print_r($relationalQueryHelper->getAssociativeMap($associativeTableDescription, $data));
