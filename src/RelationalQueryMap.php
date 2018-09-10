@@ -1,6 +1,6 @@
 <?php
 
-class RelationalQueryHelper {
+class RelationalQueryMap {
     
     private $map;
     
@@ -108,7 +108,7 @@ $relatedTableDescription = [
     ]
 ];
 
-$relationalQueryHelper = new RelationalQueryHelper($tableDescription);
+$relationalQueryHelper = new RelationalQueryMap($tableDescription);
 $relationalQueryHelper->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
 
 print_r($relationalQueryHelper->get('boletins_de_ocorrencias', $data));
