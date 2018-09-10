@@ -75,11 +75,12 @@ class RelationalQueryHelper {
                 array_push($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
                 array_push($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
             }
+            
+            $this->map['where'] = implode(" AND ", $this->where);
         }
         
         $this->map['select'] = implode(", ", $this->select);
         $this->map['from'] = implode(", ", $this->from);
-        $this->map['where'] = implode(" AND ", $this->where);
         
         return $this->map;
     }
