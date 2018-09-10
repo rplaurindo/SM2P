@@ -1,6 +1,6 @@
 <?php
 
-class RelationalQueryMap {
+class RelationalQueryBasicMap {
     
     private $map;
     
@@ -14,6 +14,8 @@ class RelationalQueryMap {
     
     private $PK;
     
+    private $hasOne;
+    
     private $hasMany;
     
     function __construct(array $tableDescription) {
@@ -22,7 +24,8 @@ class RelationalQueryMap {
             'from' => '',
             'where' => ''
         ];
-        
+
+        $this->hasOne = [];
         $this->hasMany = [];
         
         $this->select = [];
@@ -40,8 +43,13 @@ class RelationalQueryMap {
 
     }
     
+    function hasOne($table, $tableDescription) {
+        $this->hasMany[$table] = [];
+        $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
+        $this->hasMany[$table]['foreignKey'] = $tableDescription['foreignKey'];
+    }
+    
     function hasMany($table, $tableDescription) {
-        
         $this->hasMany[$table] = [];
         $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
@@ -50,7 +58,6 @@ class RelationalQueryMap {
         } else if (array_key_exists('through', $tableDescription)) {
             $this->hasMany[$table]['through'] = $tableDescription['through'];
         }
-
     }
 
     function get($table, array $data) {
@@ -83,6 +90,11 @@ class RelationalQueryMap {
             }
             
             $this->map['where'] = implode(" AND ", $this->where);
+        } else if (array_key_exists($table, $this->hasOne)) {
+            $fk = $relatedTableDescription['foreignKey'];
+            $value = $data[$this->PK];
+            array_push($this->where, "$this->table.$this->PK = $value");
+            array_push($this->where, "$table.$fk = $this->table.$this->PK");
         }
         
         $this->map['select'] = implode(", ", $this->select);
@@ -118,7 +130,8 @@ $relatedTableDescription = [
     
 ];
 
-$relationalQueryMap = new RelationalQueryMap($tableDescription);
-$relationalQueryMap->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
+$relationalQueryBasicMap = new RelationalQueryBasicMap($tableDescription);
+// $relationalQueryBasicMap->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
+$relationalQueryBasicMap->hasOne('boletins_de_ocorrencias', $relatedTableDescription);
 
-print_r($relationalQueryMap->get('boletins_de_ocorrencias', $data));
+print_r($relationalQueryBasicMap->get('boletins_de_ocorrencias', $data));
