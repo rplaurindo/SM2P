@@ -106,7 +106,7 @@ $tableDescription = [
 $relatedTableDescription = [
     'primaryKey' => 'id',
     
-//     'foreignKey' => 'ocorrencia_id',
+    'foreignKey' => 'ocorrencia_id',
     
     'through' => [
         'table' => 'boletins_ocorrencias',
@@ -118,7 +118,7 @@ $relatedTableDescription = [
     
 ];
 
-$relationalQueryHelper = new RelationalQueryMap($tableDescription);
-$relationalQueryHelper->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
+$relationalQueryMap = new RelationalQueryMap($tableDescription);
+$relationalQueryMap->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
 
-print_r($relationalQueryHelper->get('boletins_de_ocorrencias', $data));
+print_r($relationalQueryMap->get('boletins_de_ocorrencias', $data));
