@@ -14,16 +14,16 @@ class RelationalQueryHelper {
     
     private $PK;
     
-    private $relatedTable;
+    private $hasMany;
     
-    private $relatedTablePK;
-    
-    function __construct(array $tableDescription, array $relatedTableDescription) {
+    function __construct(array $tableDescription) {
         $this->map = [
             'select' => '',
             'from' => '',
             'where' => ''
         ];
+        
+        $this->hasMany = [];
         
         $this->select = [];
         $this->from = [];
@@ -31,49 +31,52 @@ class RelationalQueryHelper {
         
         if (array_key_exists('name', $tableDescription)) {
             $this->table = $tableDescription['name'];
+            array_push($this->from, $this->table);
         }
         
         if (array_key_exists('primaryKey', $tableDescription)) {
             $this->PK = $tableDescription['primaryKey'];
         }
+
+    }
+    
+    function hasMany($table, $tableDescription) {
+        array_push($this->hasMany, $table);
         
-        if (array_key_exists('name', $relatedTableDescription)) {
-            $this->relatedTable = $relatedTableDescription['name'];
-        }
+        $this->hasMany[$table] = [];
+        $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
-        if (array_key_exists('primaryKey', $relatedTableDescription)) {
-            $this->relatedTablePK = $relatedTableDescription['primaryKey'];
+        if (array_key_exists('through', $tableDescription)) {
+            $this->hasMany[$table]['through'] = $tableDescription['through'];
         }
 
     }
 
-    function getAssociativeMap(array $associativeTableDescription, array $data) {
+    function get($table, array $data) {
         
-        if (array_key_exists('name', $associativeTableDescription)) {
-            $associativeTable = $associativeTableDescription['name'];
-        }
-        
-        if (array_key_exists($this->table, $associativeTableDescription)) {
-            $associativeTableKey = $associativeTableDescription[$this->table];
-        }
-        
-        if (array_key_exists($this->relatedTable, $associativeTableDescription)) {
-            $associativeRelatedTableKey = $associativeTableDescription[$this->relatedTable];
-        }
-        
-        array_push($this->from, "$associativeTable");
-                
         array_push($this->select, "$this->table.$this->PK");
-        array_push($this->from, "$this->table");
+        array_push($this->from, $table);
         
-        array_push($this->select, "$this->relatedTable.$this->relatedTablePK");
-        array_push($this->from, "$this->relatedTable");
-        
-        $value = $data[$associativeTableKey];
-        array_push($this->where, "$this->table.$this->PK = '$value'");
-        array_push($this->where, "$associativeTable.$associativeTableKey = $this->table.$this->PK");
-        array_push($this->where, "$associativeTable.$associativeRelatedTableKey = $this->relatedTable.$this->relatedTablePK");
+        if (array_key_exists($table, $this->hasMany)) {
+            $relatedTableDescription = $this->hasMany[$table];
+            $relatedTablePK = $relatedTableDescription['primaryKey'];
+            array_push($this->select, "$table.$relatedTablePK");
             
+            if (array_key_exists('through', $relatedTableDescription)) {
+                $associativeTableDescription = $relatedTableDescription['through'];
+                $associativeTable = $associativeTableDescription['table'];
+                array_push($this->from, $associativeTable);
+                
+                $associatedTableKey = $associativeTableDescription['associativeKeys'][$this->table];
+                $associatedRelatedTableKey = $associativeTableDescription['associativeKeys'][$table];
+                
+                $value = $data[$associatedTableKey];
+                array_push($this->where, "$this->table.$this->PK = $value");
+                array_push($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
+                array_push($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
+            }
+        }
+        
         $this->map['select'] = implode(", ", $this->select);
         $this->map['from'] = implode(", ", $this->from);
         $this->map['where'] = implode(" AND ", $this->where);
@@ -82,27 +85,29 @@ class RelationalQueryHelper {
     }
 }
 
+// array associativo montado automaticamente pelo Angular
+$data = [
+    'ocorrencia_id' => 2
+];
+
 $tableDescription = [
     'name' => 'ocorrencias',
     'primaryKey' => 'id'
 ];
 
 $relatedTableDescription = [
-    'name' => 'boletins_de_ocorrencias',
-    'primaryKey' => 'id'
+    'primaryKey' => 'id',
+    
+    'through' => [
+        'table' => 'boletins_ocorrencias',
+        'associativeKeys' => [
+            'ocorrencias' => 'ocorrencia_id',
+            'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
+        ]
+    ]
 ];
 
-// array associativo montado automaticamente pelo Angular
-$data = [
-    'ocorrencia_id' => 2
-];
+$relationalQueryHelper = new RelationalQueryHelper($tableDescription);
+$relationalQueryHelper->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
 
-$relationalQueryHelper = new RelationalQueryHelper($tableDescription, $relatedTableDescription);
-
-$associativeTableDescription = [
-    'name' => 'boletins_ocorrencias',
-    'ocorrencias' => 'ocorrencia_id',
-    'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
-];
-
-print_r($relationalQueryHelper->getAssociativeMap($associativeTableDescription, $data));
+print_r($relationalQueryHelper->get('boletins_de_ocorrencias', $data));
