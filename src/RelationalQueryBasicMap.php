@@ -14,9 +14,7 @@ class RelationalQueryBasicMap {
     
     private $PK;
     
-    private $hasOne;
-    
-    private $hasMany;
+    private $has;
     
     function __construct(array $tableDescription) {
         $this->map = [
@@ -24,9 +22,6 @@ class RelationalQueryBasicMap {
             'from' => '',
             'where' => ''
         ];
-
-        $this->hasOne = [];
-        $this->hasMany = [];
         
         $this->select = [];
         $this->from = [];
@@ -40,25 +35,19 @@ class RelationalQueryBasicMap {
         if (array_key_exists('primaryKey', $tableDescription)) {
             $this->PK = $tableDescription['primaryKey'];
         }
+        
+        $this->has = [];
 
     }
     
-    function hasOne($table, $tableDescription) {
-        $this->hasOne[$table] = [];
-        $this->hasOne[$table]['primaryKey'] = $tableDescription['primaryKey'];
-        if (array_key_exists('foreignKey', $tableDescription)) {
-            $this->hasOne[$table]['foreignKey'] = $tableDescription['foreignKey'];
-        }
-    }
-    
-    function hasMany($table, $tableDescription) {
-        $this->hasMany[$table] = [];
-        $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
+    function has($table, $tableDescription) {
+        $this->has[$table] = [];
+        $this->has[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
         if (array_key_exists('foreignKey', $tableDescription)) {
-            $this->hasMany[$table]['foreignKey'] = $tableDescription['foreignKey'];
+            $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
         } else if (array_key_exists('through', $tableDescription)) {
-            $this->hasMany[$table]['through'] = $tableDescription['through'];
+            $this->has[$table]['through'] = $tableDescription['through'];
         }
     }
 
@@ -66,9 +55,9 @@ class RelationalQueryBasicMap {
         
         array_push($this->select, "$this->table.$this->PK");
         array_push($this->from, $table);
-        
-        if (array_key_exists($table, $this->hasMany)) {
-            $relatedTableDescription = $this->hasMany[$table];
+
+        if (array_key_exists($table, $this->has)) {
+            $relatedTableDescription = $this->has[$table];
             $relatedTablePK = $relatedTableDescription['primaryKey'];
             array_push($this->select, "$table.$relatedTablePK");
             
@@ -90,15 +79,6 @@ class RelationalQueryBasicMap {
                 array_push($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
                 array_push($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
             }
-            
-        } else if (array_key_exists($table, $this->hasOne)) {
-            $relatedTableDescription = $this->hasOne[$table];
-            $relatedTablePK = $relatedTableDescription['primaryKey'];
-            array_push($this->select, "$table.$relatedTablePK");
-            $fk = $relatedTableDescription['foreignKey'];
-            $value = $data[$this->PK];
-            array_push($this->where, "$this->table.$this->PK = $value");
-            array_push($this->where, "$table.$fk = $this->table.$this->PK");
         }
         
         $this->map['select'] = implode(", ", $this->select);
@@ -136,8 +116,6 @@ $relatedTableDescription = [
 ];
 
 $relationalQueryBasicMap = new RelationalQueryBasicMap($tableDescription);
-// $relationalQueryBasicMap->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
-// $relationalQueryBasicMap->hasOne('boletins_de_ocorrencias', $relatedTableDescription);
-$relationalQueryBasicMap->hasOne('boletins_de_ocorrencias', $relatedTableDescription);
+$relationalQueryBasicMap->has('boletins_de_ocorrencias', $relatedTableDescription);
 
 print_r($relationalQueryBasicMap->get('boletins_de_ocorrencias', $data));
