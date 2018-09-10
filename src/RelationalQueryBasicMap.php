@@ -44,9 +44,11 @@ class RelationalQueryBasicMap {
     }
     
     function hasOne($table, $tableDescription) {
-        $this->hasMany[$table] = [];
-        $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
-        $this->hasMany[$table]['foreignKey'] = $tableDescription['foreignKey'];
+        $this->hasOne[$table] = [];
+        $this->hasOne[$table]['primaryKey'] = $tableDescription['primaryKey'];
+        if (array_key_exists('foreignKey', $tableDescription)) {
+            $this->hasOne[$table]['foreignKey'] = $tableDescription['foreignKey'];
+        }
     }
     
     function hasMany($table, $tableDescription) {
@@ -89,8 +91,10 @@ class RelationalQueryBasicMap {
                 array_push($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
             }
             
-            $this->map['where'] = implode(" AND ", $this->where);
         } else if (array_key_exists($table, $this->hasOne)) {
+            $relatedTableDescription = $this->hasOne[$table];
+            $relatedTablePK = $relatedTableDescription['primaryKey'];
+            array_push($this->select, "$table.$relatedTablePK");
             $fk = $relatedTableDescription['foreignKey'];
             $value = $data[$this->PK];
             array_push($this->where, "$this->table.$this->PK = $value");
@@ -99,6 +103,7 @@ class RelationalQueryBasicMap {
         
         $this->map['select'] = implode(", ", $this->select);
         $this->map['from'] = implode(", ", $this->from);
+        $this->map['where'] = implode(" AND ", $this->where);
         
         return $this->map;
     }
@@ -132,6 +137,7 @@ $relatedTableDescription = [
 
 $relationalQueryBasicMap = new RelationalQueryBasicMap($tableDescription);
 // $relationalQueryBasicMap->hasMany('boletins_de_ocorrencias', $relatedTableDescription);
+// $relationalQueryBasicMap->hasOne('boletins_de_ocorrencias', $relatedTableDescription);
 $relationalQueryBasicMap->hasOne('boletins_de_ocorrencias', $relatedTableDescription);
 
 print_r($relationalQueryBasicMap->get('boletins_de_ocorrencias', $data));
