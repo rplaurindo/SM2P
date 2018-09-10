@@ -41,12 +41,13 @@ class RelationalQueryMap {
     }
     
     function hasMany($table, $tableDescription) {
-        array_push($this->hasMany, $table);
         
         $this->hasMany[$table] = [];
         $this->hasMany[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
-        if (array_key_exists('through', $tableDescription)) {
+        if (array_key_exists('foreignKey', $tableDescription)) {
+            $this->hasMany[$table]['foreignKey'] = $tableDescription['foreignKey'];
+        } else if (array_key_exists('through', $tableDescription)) {
             $this->hasMany[$table]['through'] = $tableDescription['through'];
         }
 
@@ -62,13 +63,18 @@ class RelationalQueryMap {
             $relatedTablePK = $relatedTableDescription['primaryKey'];
             array_push($this->select, "$table.$relatedTablePK");
             
-            if (array_key_exists('through', $relatedTableDescription)) {
+            if (array_key_exists('foreignKey', $relatedTableDescription)) {
+                $fk = $relatedTableDescription['foreignKey'];
+                $value = $data[$this->PK];
+                array_push($this->where, "$this->table.$this->PK = $value");
+                array_push($this->where, "$table.$fk = $this->table.$this->PK");
+            } else if (array_key_exists('through', $relatedTableDescription)) {
                 $associativeTableDescription = $relatedTableDescription['through'];
                 $associativeTable = $associativeTableDescription['table'];
                 array_push($this->from, $associativeTable);
                 
-                $associatedTableKey = $associativeTableDescription['associativeKeys'][$this->table];
-                $associatedRelatedTableKey = $associativeTableDescription['associativeKeys'][$table];
+                $associatedTableKey = $associativeTableDescription['keys'][$this->table];
+                $associatedRelatedTableKey = $associativeTableDescription['keys'][$table];
                 
                 $value = $data[$associatedTableKey];
                 array_push($this->where, "$this->table.$this->PK = $value");
@@ -88,7 +94,8 @@ class RelationalQueryMap {
 
 // array associativo montado automaticamente pelo Angular
 $data = [
-    'ocorrencia_id' => 2
+    'ocorrencia_id' => 2,
+    'id' => 2
 ];
 
 $tableDescription = [
@@ -99,13 +106,16 @@ $tableDescription = [
 $relatedTableDescription = [
     'primaryKey' => 'id',
     
+//     'foreignKey' => 'ocorrencia_id',
+    
     'through' => [
         'table' => 'boletins_ocorrencias',
-        'associativeKeys' => [
+        'keys' => [
             'ocorrencias' => 'ocorrencia_id',
             'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
         ]
     ]
+    
 ];
 
 $relationalQueryHelper = new RelationalQueryMap($tableDescription);
