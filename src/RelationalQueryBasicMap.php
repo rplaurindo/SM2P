@@ -17,6 +17,7 @@ class RelationalQueryBasicMap {
     private $has;
     
     function __construct(array $tableDescription) {
+//         keeps the order
         $this->map = [
             'select' => '',
             'from' => '',
