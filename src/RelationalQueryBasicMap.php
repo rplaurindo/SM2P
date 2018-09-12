@@ -38,7 +38,6 @@ class RelationalQueryBasicMap {
         }
         
         $this->has = [];
-
     }
     
     function has($table, $tableDescription) {
@@ -50,7 +49,6 @@ class RelationalQueryBasicMap {
         } else if (array_key_exists('foreignKey', $tableDescription)) {
             $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
         }
-        
     }
 
     function get($table, array $data) {
@@ -97,11 +95,9 @@ class RelationalQueryBasicMap {
     }
     
     private function attachesAt(ArrayObject $list, $statement) {
-        
         if (!in_array($statement, $list->getArrayCopy())) {
             $list->append($statement);
         }
-        
     }
     
 }
