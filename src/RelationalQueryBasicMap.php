@@ -45,12 +45,6 @@ class RelationalQueryBasicMap {
         $this->has[$table] = [];
         $this->has[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
-//         if (array_key_exists('foreignKey', $tableDescription)) {
-//             $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
-//         } else if (array_key_exists('through', $tableDescription)) {
-//             $this->has[$table]['through'] = $tableDescription['through'];
-//         }
-        
         if (array_key_exists('through', $tableDescription)) {
             $this->has[$table]['through'] = $tableDescription['through'];
         } else if (array_key_exists('foreignKey', $tableDescription)) {
@@ -119,8 +113,8 @@ $data = [
 ];
 
 $tableDescription = [
-//     'name' => 'ocorrencias',
-//     'primaryKey' => 'id'
+    'name' => 'ocorrencias',
+    'primaryKey' => 'id'
 ];
 
 $relatedTableDescription = [
@@ -128,13 +122,13 @@ $relatedTableDescription = [
     
     'foreignKey' => 'ocorrencia_id',
     
-//     'through' => [
-//         'table' => 'boletins_ocorrencias',
-//         'keys' => [
-//             'ocorrencias' => 'ocorrencia_id',
-//             'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
-//         ]
-//     ]
+    'through' => [
+        'table' => 'boletins_ocorrencias',
+        'keys' => [
+            'ocorrencias' => 'ocorrencia_id',
+            'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
+        ]
+    ]
     
 ];
 
