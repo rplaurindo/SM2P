@@ -45,11 +45,18 @@ class RelationalQueryBasicMap {
         $this->has[$table] = [];
         $this->has[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
-        if (array_key_exists('foreignKey', $tableDescription)) {
-            $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
-        } else if (array_key_exists('through', $tableDescription)) {
+//         if (array_key_exists('foreignKey', $tableDescription)) {
+//             $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
+//         } else if (array_key_exists('through', $tableDescription)) {
+//             $this->has[$table]['through'] = $tableDescription['through'];
+//         }
+        
+        if (array_key_exists('through', $tableDescription)) {
             $this->has[$table]['through'] = $tableDescription['through'];
+        } else if (array_key_exists('foreignKey', $tableDescription)) {
+            $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
         }
+        
     }
 
     function get($table, array $data) {
@@ -62,12 +69,7 @@ class RelationalQueryBasicMap {
             $relatedTablePK = $relatedTableDescription['primaryKey'];
             $this->attachesAt($this->select, "$table.$relatedTablePK");
             
-            if (array_key_exists('foreignKey', $relatedTableDescription)) {
-                $fk = $relatedTableDescription['foreignKey'];
-                $value = $data[$this->PK];
-                $this->attachesAt($this->where, "$this->table.$this->PK = $value");
-                $this->attachesAt($this->where, "$table.$fk = $this->table.$this->PK");
-            } else if (array_key_exists('through', $relatedTableDescription)) {
+            if (array_key_exists('through', $relatedTableDescription)) {
                 $associativeTableDescription = $relatedTableDescription['through'];
                 $associativeTable = $associativeTableDescription['table'];
                 $this->attachesAt($this->from, $associativeTable);
@@ -75,11 +77,21 @@ class RelationalQueryBasicMap {
                 $associatedTableKey = $associativeTableDescription['keys'][$this->table];
                 $associatedRelatedTableKey = $associativeTableDescription['keys'][$table];
                 
-                $value = $data[$associatedTableKey];
-                $this->attachesAt($this->where, "$this->table.$this->PK = $value");
-                $this->attachesAt($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
-                $this->attachesAt($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
+                if (array_key_exists($associatedTableKey, $data)) {
+                    $value = $data[$associatedTableKey];
+                    $this->attachesAt($this->where, "$this->table.$this->PK = $value");
+                    $this->attachesAt($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
+                    $this->attachesAt($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
+                }
+            } else if (array_key_exists('foreignKey', $relatedTableDescription)) {
+                $fk = $relatedTableDescription['foreignKey'];
+                if (array_key_exists($this->PK, $data)) {
+                    $value = $data[$this->PK];
+                    $this->attachesAt($this->where, "$this->table.$this->PK = $value");
+                    $this->attachesAt($this->where, "$table.$fk = $this->table.$this->PK");
+                }
             }
+            
         }
         
         $this->map['select'] = implode(", ", $this->select->getArrayCopy());
@@ -102,27 +114,27 @@ class RelationalQueryBasicMap {
 
 // array associativo montado automaticamente pelo Angular
 $data = [
-    'ocorrencia_id' => 2,
-    'id' => 2
+    'id' => 2,
+    'ocorrencia_id' => 2
 ];
 
 $tableDescription = [
-    'name' => 'ocorrencias',
-    'primaryKey' => 'id'
+//     'name' => 'ocorrencias',
+//     'primaryKey' => 'id'
 ];
 
 $relatedTableDescription = [
     'primaryKey' => 'id',
     
-//     'foreignKey' => 'ocorrencia_id',
+    'foreignKey' => 'ocorrencia_id',
     
-    'through' => [
-        'table' => 'boletins_ocorrencias',
-        'keys' => [
-            'ocorrencias' => 'ocorrencia_id',
-            'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
-        ]
-    ]
+//     'through' => [
+//         'table' => 'boletins_ocorrencias',
+//         'keys' => [
+//             'ocorrencias' => 'ocorrencia_id',
+//             'boletins_de_ocorrencias' => 'boletim_de_ocorrencia_id'
+//         ]
+//     ]
     
 ];
 
