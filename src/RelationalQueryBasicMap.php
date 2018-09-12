@@ -25,8 +25,8 @@ class RelationalQueryBasicMap {
         ];
         
         $this->select = new ArrayObject();
-        $this->from = new ArrayObject();
-        $this->where = new ArrayObject();
+        $this->from   = new ArrayObject();
+        $this->where  = new ArrayObject();
         
         if (array_key_exists('name', $tableDescription)) {
             $this->table = $tableDescription['name'];
@@ -87,8 +87,8 @@ class RelationalQueryBasicMap {
         }
         
         $this->map['select'] = implode(", ", $this->select->getArrayCopy());
-        $this->map['from'] = implode(", ", $this->from->getArrayCopy());
-        $this->map['where'] = implode(" AND ", $this->where->getArrayCopy());
+        $this->map['from']   = implode(", ", $this->from->getArrayCopy());
+        $this->map['where']  = implode(" AND ", $this->where->getArrayCopy());
         
         return $this->map;
         
