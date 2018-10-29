@@ -25,8 +25,8 @@ class RelationalQueryBasicMap {
         ];
         
         $this->select = new ArrayObject();
-        $this->from = new ArrayObject();
-        $this->where = new ArrayObject();
+        $this->from   = new ArrayObject();
+        $this->where  = new ArrayObject();
         
         if (array_key_exists('name', $tableDescription)) {
             $this->table = $tableDescription['name'];
@@ -38,17 +38,16 @@ class RelationalQueryBasicMap {
         }
         
         $this->has = [];
-
     }
     
     function has($table, $tableDescription) {
         $this->has[$table] = [];
         $this->has[$table]['primaryKey'] = $tableDescription['primaryKey'];
         
-        if (array_key_exists('foreignKey', $tableDescription)) {
-            $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
-        } else if (array_key_exists('through', $tableDescription)) {
+        if (array_key_exists('through', $tableDescription)) {
             $this->has[$table]['through'] = $tableDescription['through'];
+        } else if (array_key_exists('foreignKey', $tableDescription)) {
+            $this->has[$table]['foreignKey'] = $tableDescription['foreignKey'];
         }
     }
 
@@ -62,12 +61,7 @@ class RelationalQueryBasicMap {
             $relatedTablePK = $relatedTableDescription['primaryKey'];
             $this->attachesAt($this->select, "$table.$relatedTablePK");
             
-            if (array_key_exists('foreignKey', $relatedTableDescription)) {
-                $fk = $relatedTableDescription['foreignKey'];
-                $value = $data[$this->PK];
-                $this->attachesAt($this->where, "$this->table.$this->PK = $value");
-                $this->attachesAt($this->where, "$table.$fk = $this->table.$this->PK");
-            } else if (array_key_exists('through', $relatedTableDescription)) {
+            if (array_key_exists('through', $relatedTableDescription)) {
                 $associativeTableDescription = $relatedTableDescription['through'];
                 $associativeTable = $associativeTableDescription['table'];
                 $this->attachesAt($this->from, $associativeTable);
@@ -75,35 +69,43 @@ class RelationalQueryBasicMap {
                 $associatedTableKey = $associativeTableDescription['keys'][$this->table];
                 $associatedRelatedTableKey = $associativeTableDescription['keys'][$table];
                 
-                $value = $data[$associatedTableKey];
-                $this->attachesAt($this->where, "$this->table.$this->PK = $value");
-                $this->attachesAt($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
-                $this->attachesAt($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
+                if (array_key_exists($associatedTableKey, $data)) {
+                    $value = $data[$associatedTableKey];
+                    $this->attachesAt($this->where, "$this->table.$this->PK = $value");
+                    $this->attachesAt($this->where, "$associativeTable.$associatedTableKey = $this->table.$this->PK");
+                    $this->attachesAt($this->where, "$associativeTable.$associatedRelatedTableKey = $table.$relatedTablePK");
+                }
+            } else if (array_key_exists('foreignKey', $relatedTableDescription)) {
+                $fk = $relatedTableDescription['foreignKey'];
+                if (array_key_exists($this->PK, $data)) {
+                    $value = $data[$this->PK];
+                    $this->attachesAt($this->where, "$this->table.$this->PK = $value");
+                    $this->attachesAt($this->where, "$table.$fk = $this->table.$this->PK");
+                }
             }
+            
         }
         
         $this->map['select'] = implode(", ", $this->select->getArrayCopy());
-        $this->map['from'] = implode(", ", $this->from->getArrayCopy());
-        $this->map['where'] = implode(" AND ", $this->where->getArrayCopy());
+        $this->map['from']   = implode(", ", $this->from->getArrayCopy());
+        $this->map['where']  = implode(" AND ", $this->where->getArrayCopy());
         
         return $this->map;
         
     }
     
     private function attachesAt(ArrayObject $list, $statement) {
-        
         if (!in_array($statement, $list->getArrayCopy())) {
             $list->append($statement);
         }
-        
     }
     
 }
 
 // array associativo montado automaticamente pelo Angular
 $data = [
-    'ocorrencia_id' => 2,
-    'id' => 2
+    'id' => 2,
+    'ocorrencia_id' => 2
 ];
 
 $tableDescription = [
@@ -114,7 +116,7 @@ $tableDescription = [
 $relatedTableDescription = [
     'primaryKey' => 'id',
     
-//     'foreignKey' => 'ocorrencia_id',
+    'foreignKey' => 'ocorrencia_id',
     
     'through' => [
         'table' => 'boletins_ocorrencias',
