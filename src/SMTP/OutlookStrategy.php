@@ -2,7 +2,7 @@
 
 namespace SM2P\SMTP;
 
-use SM2P\AbstractSMTP;
+use AbstractSMTP;
 
 class OutlookStrategy extends AbstractSMTP {
 
