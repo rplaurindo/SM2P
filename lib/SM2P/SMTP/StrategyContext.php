@@ -1,6 +1,6 @@
 <?php
 
-namespace SMTP;
+namespace SM2P\SMTP;
 
 use AbstractSMTP;
 

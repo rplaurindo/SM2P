@@ -1,5 +1,9 @@
 <?php
 
+namespace SM2P;
+
+use Exception;
+
 abstract class AbstractMailProtocol {
 
     private $login;

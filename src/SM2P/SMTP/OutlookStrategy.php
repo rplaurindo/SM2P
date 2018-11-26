@@ -2,8 +2,6 @@
 
 namespace SM2P\SMTP;
 
-use AbstractSMTP;
-
 class OutlookStrategy extends AbstractSMTP {
 
     function __construct($sender, array $options = []) {

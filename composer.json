@@ -16,9 +16,10 @@
   },
   "autoload": {
     "classmap": [
-      "lib/"
+      
     ],
     "psr-4": {
+      "SM2P\\": "lib/",
       "SM2P\\": "src/"
     }
   }
