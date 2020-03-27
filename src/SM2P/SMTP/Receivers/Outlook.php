@@ -61,7 +61,7 @@ class Outlook extends Receiver {
 
 // https://www.openssl.org/docs/man1.0.2/man1/s_client.html
 
-// $ openssl s_client -starttls smtp -connect <smtp.address>:587 -crlf <-ign_eof | <<EOF>
+// $ openssl s_client -starttls smtp -connect <smtp.address>:587 <-ign_eof | <<EOF>
 
 // > EHLO smtp.office365.com
 
