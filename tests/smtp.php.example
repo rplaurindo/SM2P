@@ -1,0 +1,19 @@
+<?php
+
+require 'autoload.php';
+
+use SM2P\SMTP\Receivers;
+
+$smtp = new Receivers\Outlook('');
+
+$smtp->definesPassword('');
+
+$smtp->addsTo('', '');
+
+$smtp->definesSubject('Test of subject');
+
+$smtp->definesBody('<b>Test</b> of body');
+
+if ($smtp->send()) {
+    echo "\nThe e-mail was sent.\n";
+}
