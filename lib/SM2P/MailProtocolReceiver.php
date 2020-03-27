@@ -70,20 +70,21 @@ class MailProtocolReceiver {
         
         if (!array_key_exists('appendsEOL', $options)) {
             $options['appendsEOL'] = true;
-            fputs($this->socket, $command . PHP_EOL);
-            echo "\n$command". PHP_EOL;
-        } else {
-            echo "\n$command";
-            fputs($this->socket, $command);
         }
+        
+        if ($options['appendsEOL']) {
+//             EOL = End Of Line
+            $command .= PHP_EOL;
+        }
+        
+        echo "\n$command";
+        fputs($this->socket, $command);
         
         if (!array_key_exists('hasManyLines', $options)) {
-            $hasManyLines = false;
-        } else {
-            $hasManyLines = $options['hasManyLines'];
+            $options['hasManyLines'] = false;
         }
         
-        if ($hasManyLines) {
+        if ($options['hasManyLines']) {
             $this->eachLine();
 //             eachLine already calls getResponse() to defines lines
             return $this->lines;
