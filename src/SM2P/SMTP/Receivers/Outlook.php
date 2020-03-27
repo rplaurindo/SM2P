@@ -65,10 +65,13 @@ class Outlook extends Receiver {
 
 // > EHLO smtp.office365.com
 
+// encoded as base64
 // > AUTH LOGIN login==
+// encoded as base64
 // > password
 
-// > AUTH PLAIN login
+// encoded as base64
+// > AUTH PLAIN \0login\0password
 
 // > MAIL FROM:<>
 // > RCPT TO:<>
