@@ -43,7 +43,7 @@ class CommandInvoker {
                 $command = new SMTP\BodyCommand($this->receiver);
                 break;
             case 'QUIT':
-                $command = new Streaming\QUITCommand($this->receiver);
+                $command = new Streaming\QuitCommand($this->receiver);
         }
 
         return $command->execute();

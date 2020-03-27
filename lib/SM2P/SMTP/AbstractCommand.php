@@ -2,9 +2,10 @@
 
 namespace SM2P\SMTP;
 
-use SM2P;
+use
+    SM2P\AbstractMailProtocolCommand;
 
-abstract class AbstractCommand extends SM2P\AbstractMailProtocolCommand {
+abstract class AbstractCommand extends AbstractMailProtocolCommand {
 
     protected $receiver;
 

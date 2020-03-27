@@ -2,11 +2,13 @@
 
 namespace SM2P\Commands\SMTP;
 
-use SM2P\SMTP;
+use
+    SM2P\SMTP\AbstractCommand,
+    SM2P\SMTP\Receiver;
 
-class HeaderCommand extends SMTP\AbstractCommand {
+class HeaderCommand extends AbstractCommand {
 
-    function __construct(SMTP\Receiver $receiver) {
+    function __construct(Receiver $receiver) {
         parent::__construct($receiver);
     }
 

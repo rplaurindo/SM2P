@@ -15,7 +15,7 @@ class BodyCommand extends AbstractCommand {
     function execute() {
         $lines = $this->receiver->sendCommand(PHP_EOL);
         $lines .= $this->receiver->sendCommand($this->receiver->getBody());
-        $lines .= $this->receiver->sendCommand('.', ['appendsEOL' => false]);
+        $lines .= $this->receiver->sendCommand('.');
         
         return $lines;
     }

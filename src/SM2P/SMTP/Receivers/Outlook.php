@@ -23,23 +23,25 @@ class Outlook extends Receiver {
         
         echo $this->commandInvoker->send('EHLO');
         
-        $this->commandInvoker->send('STARTTLS');
+        echo $this->commandInvoker->send('STARTTLS');
         
 //         the extension openssl should be enabled, otherwise that will give "timeout"
         if ($this->encryptConnection()) {
             echo "The connection stream has been encrypted.\n";
         }
-
-        $this->commandInvoker->send('AUTH LOGIN');
-        $this->commandInvoker->send('PASSWORD');
         
-        $this->commandInvoker->send('SENDER');
-        $this->commandInvoker->send('RECIPIENTS');
+        echo $this->commandInvoker->send('EHLO');
+
+        echo $this->commandInvoker->send('AUTH LOGIN');
+        echo $this->commandInvoker->send('PASSWORD');
+        
+        echo $this->commandInvoker->send('SENDER');
+        echo $this->commandInvoker->send('RECIPIENTS');
         
 //         defines To, Content-Type and Subject
-        $this->commandInvoker->send('HEADER');
+        echo $this->commandInvoker->send('HEADER');
 
-        $this->commandInvoker->send('BODY');
+        echo $this->commandInvoker->send('BODY');
         
         if ($this->getResponseCode() === '250') {
             $sent = true;
@@ -60,7 +62,7 @@ class Outlook extends Receiver {
 // https://www.openssl.org/docs/man1.0.2/man1/s_client.html
 
 // $ openssl s_client -starttls smtp -connect <smtp.address>:587 <-ign_eof | <<EOF>
-
+// this command is necessary once cause' the connection starts already encrypted
 // > EHLO smtp.office365.com
 
 // encoded as base64
