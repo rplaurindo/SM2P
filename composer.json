@@ -1,0 +1,23 @@
+{
+  "name": "rplaurindo/sm2p",
+  "version": "1.0.0",
+  "homepage": "https://github.com/rplaurindo/sm2p",
+  "description": "A Simple Mail for PHP.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rafael Laurindo",
+      "email": "rafaelplaurindo@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "~5.6"
+  },
+  "autoload": {
+    "classmap": [
+      "lib/",
+      "src/"
+    ]
+  }
+}

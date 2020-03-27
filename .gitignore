@@ -1,0 +1,5 @@
+/.settings
+tests/smtp.php
+
+.buildpath
+.project
