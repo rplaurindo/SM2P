@@ -2,17 +2,22 @@
 
 namespace SM2P\Commands\SMTP;
 
-use SM2P\SMTP;
+use
+    SM2P\SMTP\AbstractCommand,
+    SM2P\SMTP\Receiver;
 
-class BodyCommand extends SMTP\AbstractCommand {
+class BodyCommand extends AbstractCommand {
 
-    function __construct(SMTP\Receiver $receiver) {
+    function __construct(Receiver $receiver) {
         parent::__construct($receiver);
     }
 
     function execute() {
-        $this->receiver->sendCommand(PHP_EOL . $this->receiver->getBody());
-        return $this->receiver->sendCommand('.', ['appendsEOL' => false]);
+        $lines = $this->receiver->sendCommand(PHP_EOL);
+        $lines .= $this->receiver->sendCommand($this->receiver->getBody());
+        $lines .= $this->receiver->sendCommand('.', ['appendsEOL' => false]);
+        
+        return $lines;
     }
 
 }

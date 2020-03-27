@@ -21,7 +21,7 @@ class Outlook extends Receiver {
     function send() {
         $sent = false;
         
-        $this->commandInvoker->send('EHLO');
+        echo $this->commandInvoker->send('EHLO');
         
         $this->commandInvoker->send('STARTTLS');
         
@@ -29,8 +29,6 @@ class Outlook extends Receiver {
         if ($this->encryptConnection()) {
             echo "The connection stream has been encrypted.\n";
         }
-        
-//         echo "\n$this->lines";
 
         $this->commandInvoker->send('AUTH LOGIN');
         $this->commandInvoker->send('PASSWORD');
@@ -85,3 +83,5 @@ class Outlook extends Receiver {
 // > QUIT
 
 // > [EOF]
+
+// testar chamar o STARTTLS no mei da parada

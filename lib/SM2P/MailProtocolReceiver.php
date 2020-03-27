@@ -6,7 +6,7 @@ use Exception;
 
 class MailProtocolReceiver {
     
-    protected $lines;
+    private $lines;
 
     private $login;
     
@@ -77,7 +77,7 @@ class MailProtocolReceiver {
             $command .= PHP_EOL;
         }
         
-        echo "\n$command";
+//         echo "\n$command";
         fputs($this->socket, $command);
         
         if (!array_key_exists('hasManyLines', $options)) {
