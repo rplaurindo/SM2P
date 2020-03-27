@@ -24,8 +24,8 @@ class CommandInvoker {
             case 'STARTTLS':
                 $command = new Mail\StartTLSCommand($this->receiver);
                 break;
-            case 'LOGIN':
-                $command = new Mail\LoginCommand($this->receiver);
+            case 'AUTH LOGIN':
+                $command = new Mail\AuthLoginCommand($this->receiver);
                 break;
             case 'PASSWORD':
                 $command = new Mail\PasswordCommand($this->receiver);

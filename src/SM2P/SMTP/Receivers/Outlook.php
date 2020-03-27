@@ -3,20 +3,19 @@
 namespace SM2P\SMTP\Receivers;
 
 use
-    SM2P,
-    SM2P\SMTP;
+    SM2P\CommandInvoker,
+    SM2P\SMTP\Receiver;
 
 // Client
-class Outlook extends SMTP\Receiver {
+class Outlook extends Receiver {
 
     private $commandInvoker;
 
     function __construct($sender, array $options = []) {
 //         echo "\n$sender\n";
         parent::__construct('smtp.office365.com', 587, $sender, $options);
-//         parent::__construct('smtp.gmail.com', 587, $sender, $options);
 
-        $this->commandInvoker = new SM2P\CommandInvoker($this);
+        $this->commandInvoker = new CommandInvoker($this);
     }
 
     function send() {
@@ -33,10 +32,7 @@ class Outlook extends SMTP\Receiver {
         
 //         echo "\n$this->lines";
 
-//         desnecessário
-//         $this->commandInvoker->send('EHLO');
-
-        $this->commandInvoker->send('LOGIN');
+        $this->commandInvoker->send('AUTH LOGIN');
         $this->commandInvoker->send('PASSWORD');
         
         $this->commandInvoker->send('SENDER');
@@ -46,8 +42,6 @@ class Outlook extends SMTP\Receiver {
         $this->commandInvoker->send('HEADER');
 
         $this->commandInvoker->send('BODY');
-        
-//         echo "\nresponse: {$this->getResponse()}";
         
         if ($this->getResponseCode() === '250') {
             $sent = true;
@@ -65,19 +59,26 @@ class Outlook extends SMTP\Receiver {
 
 }
 
-// $ openssl s_client -starttls smtp -connect smtp.office365.com:587 -crlf <<EOF
+// https://www.openssl.org/docs/man1.0.2/man1/s_client.html
+
+// $ openssl s_client -starttls smtp -connect <smtp.address> -crlf <-ign_eof | <<EOF>
 
 // > EHLO smtp.office365.com
+
 // > AUTH LOGIN login==
-// > password=
+// > password
+
+// > AUTH PLAIN login
+
 // > MAIL FROM:<>
 // > RCPT TO:<>
 // > DATA
 // > To: <>
 // > Content-Type: text/html; charset=UTF-8
-// > Subject: Test of subject
+// > Subject: Subject test
 // >
 // > Test of body
 // > .
 // > QUIT
-// > EOF
+
+// > [EOF]

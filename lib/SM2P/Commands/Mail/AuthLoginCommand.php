@@ -2,14 +2,16 @@
 
 namespace SM2P\Commands\Mail;
 
-use SM2P;
+use
+    SM2P\AbstractMailProtocolCommand,
+    SM2P\MailProtocolReceiver;
 
 // Concrete Command
-class LoginCommand extends SM2P\AbstractMailProtocolCommand {
+class AuthLoginCommand extends AbstractMailProtocolCommand {
 
     private $login;
 
-    function __construct(SM2P\MailProtocolReceiver $receiver) {
+    function __construct(MailProtocolReceiver $receiver) {
         parent::__construct($receiver);
 
         $this->login = $receiver->getLogin();
