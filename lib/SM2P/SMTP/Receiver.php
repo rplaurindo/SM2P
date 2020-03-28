@@ -2,7 +2,8 @@
 
 namespace SM2P\SMTP;
 
-use SM2P\MailProtocolReceiver;
+use
+    SM2P\MailProtocolReceiver;
 
 class Receiver extends MailProtocolReceiver {
 

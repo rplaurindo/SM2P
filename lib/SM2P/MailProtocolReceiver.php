@@ -2,7 +2,8 @@
 
 namespace SM2P;
 
-use Exception;
+use
+    Exception;
 
 class MailProtocolReceiver {
     
