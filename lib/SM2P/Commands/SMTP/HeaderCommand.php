@@ -3,14 +3,9 @@
 namespace SM2P\Commands\SMTP;
 
 use
-    SM2P\SMTP\AbstractCommand,
-    SM2P\SMTP\Receiver;
+    SM2P\AbstractMailProtocolCommand;
 
-class HeaderCommand extends AbstractCommand {
-
-    function __construct(Receiver $receiver) {
-        parent::__construct($receiver);
-    }
+class HeaderCommand extends AbstractMailProtocolCommand {
 
     function execute() {
         $this->receiver->sendCommand('DATA');
