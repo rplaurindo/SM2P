@@ -8,7 +8,7 @@ use
 // Receiver
 class MailProtocolReceiver {
     
-    private $lines;
+    private $responseLines;
 
     private $login;
     
@@ -74,7 +74,7 @@ class MailProtocolReceiver {
         if ($options['hasManyLines']) {
             $this->eachLine();
 //             eachLine already calls getResponse() to defines lines
-            return $this->lines;
+            return $this->responseLines;
         }
 
         return $this->getResponse();
@@ -84,23 +84,24 @@ class MailProtocolReceiver {
         return $this->server;
     }
     
-    protected function definesLogin($login) {
-        $this->login = $login;
-    }
-    
-    protected function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
+    function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
         return stream_socket_enable_crypto($this->socket, true, $cryptoType);
     }
     
-    protected function closesConnection() {
+    function closesConnection() {
         return fclose($this->socket);
     }
     
-    protected function getResponseCode() {
-        if (strlen($this->lines) >= 4 && $this->lines[3] == " ") {
-            return substr($this->lines, 0, 3);
+    function getLastResponseCode() {
+        if (strlen($this->responseLines) >= 4 && $this->responseLines[3] == " ") {
+            return substr($this->responseLines, 0, 3);
         }
+        
         return null;
+    }
+    
+    protected function definesLogin($login) {
+        $this->login = $login;
     }
 
     private function resolvesOptions(array $options) {
@@ -110,8 +111,8 @@ class MailProtocolReceiver {
     }
 
     private function getResponse() {
-        $this->lines = fgets($this->socket);
-        return $this->lines;
+        $this->responseLines = fgets($this->socket);
+        return $this->responseLines;
     }
 
     private function eachLine() {
@@ -123,7 +124,7 @@ class MailProtocolReceiver {
             $lines .= $serverResponse;
         } while ($serverResponse !== false);
 
-        $this->lines = $lines;
+        $this->responseLines = $lines;
     }
 
 }
