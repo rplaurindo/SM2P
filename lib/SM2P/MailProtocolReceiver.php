@@ -5,6 +5,7 @@ namespace SM2P;
 use
     Exception;
 
+// Receiver
 class MailProtocolReceiver {
     
     private $lines;

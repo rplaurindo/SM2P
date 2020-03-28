@@ -11,6 +11,7 @@ class CommandInvoker {
 
     private $receiver;
 
+//     errado. É um AbstractMailProtocolCommand que deve ser passado para cá.
     function __construct(MailProtocolReceiver $receiver) {
         $this->receiver = $receiver;
     }
