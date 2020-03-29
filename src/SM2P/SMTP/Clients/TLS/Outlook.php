@@ -45,7 +45,11 @@ class Outlook {
         
         $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->receiver));
 
-        echo $this->commandInvoker->execute();
+//         echo $this->commandInvoker->execute();
+
+        $this->commandInvoker->execute(function($response) {
+            echo $response;
+        });
         
 //         the extension openssl should be enabled, otherwise that will give "timeout"
         if ($this->receiver->encryptConnection()) {
@@ -71,7 +75,10 @@ class Outlook {
 
         $this->commandInvoker->addsCommand(new Streaming\QuitCommand($this->receiver));
 
-        echo $this->commandInvoker->execute();
+//         echo $this->commandInvoker->execute();
+        $this->commandInvoker->execute(function($response) {
+            echo $response;
+        });
 
         $this->receiver->closesConnection();
 
