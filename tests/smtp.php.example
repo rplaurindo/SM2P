@@ -1,8 +1,9 @@
 <?php
 
+// Proxy Client 
 require 'autoload.php';
 
-use SM2P\SMTP\Receivers;
+use SM2P\SMTP\ClientProxies\TLS\Outlook;
 
 $smtp = new Receivers\Outlook('');
 

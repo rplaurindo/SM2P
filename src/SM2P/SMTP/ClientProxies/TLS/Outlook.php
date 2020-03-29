@@ -1,6 +1,6 @@
 <?php
 
-namespace SM2P\SMTP\Clients\TLS;
+namespace SM2P\SMTP\ClientProxies\TLS;
 
 use
     SM2P\CommandInvoker,
@@ -9,7 +9,7 @@ use
     SM2P\Commands\Streaming,
     SM2P\SMTP\Receiver;
 
-// Client
+// Command Client Proxy
 class Outlook {
     
     private $receiver;
