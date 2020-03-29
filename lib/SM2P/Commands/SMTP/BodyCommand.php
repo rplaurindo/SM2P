@@ -8,7 +8,7 @@ use
 class BodyCommand extends AbstractMailProtocolCommand {
 
     function execute() {
-        $lines = $this->receiver->sendCommand(PHP_EOL);
+        $lines = $this->receiver->sendCommand(PHP_EOL, ['appendsEOL' => false]);
         $lines .= $this->receiver->sendCommand($this->receiver->getBody());
         $lines .= $this->receiver->sendCommand('.');
         
