@@ -3,53 +3,38 @@
 namespace SM2P;
 
 use
-    Exception;
+    Exception
+;
 
 // Receiver
-class MailProtocolReceiver {
-    
-    private $responseLines;
+class StreamingReceiver {
 
-    private $login;
-    
-    private $password;
-
-    private $socket;
+    protected $streaming;
     
     private $server;
+    
+    private $responseLines;
     
     private $timeout = 10;
 
     function __construct($server, $port, array $options = []) {
         $this->resolvesOptions($options);
-
+        
         try {
             $errNum = null;
             $errStr = null;
             $this->server = $server;
-
-            $this->socket = @stream_socket_client("$server:$port", $errNum, $errStr, $this->timeout);
+            
+            $this->streaming = @stream_socket_client("$server:$port", $errNum, $errStr, $this->timeout);
             
             if (isset($errNum)) {
                 throw new Exception($errStr);
             }
-
+            
             $this->getResponse();
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-    }
-    
-    function definesPassword($password) {
-        $this->password = $password;
-    }
-    
-    function getLogin() {
-        return $this->login;
-    }
-    
-    function getPassword() {
-        return $this->password;
     }
 
 //    action
@@ -65,7 +50,7 @@ class MailProtocolReceiver {
         }
         
 //         echo "\n$command";
-        fputs($this->socket, $command);
+        fputs($this->streaming, $command);
         
         if (!array_key_exists('hasManyLines', $options)) {
             $options['hasManyLines'] = false;
@@ -76,22 +61,18 @@ class MailProtocolReceiver {
 //             eachLine already calls getResponse() to defines lines
             return $this->responseLines;
         }
-
+        
         return $this->getResponse();
     }
-    
-    function getServer() {
-        return $this->server;
-    }
-    
+
     function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
-        return stream_socket_enable_crypto($this->socket, true, $cryptoType);
+        return stream_socket_enable_crypto($this->streaming, true, $cryptoType);
     }
-    
+
     function closesConnection() {
-        return fclose($this->socket);
+        fclose($this->streaming);
     }
-    
+
     function getLastResponseCode() {
         if (strlen($this->responseLines) >= 4 && $this->responseLines[3] == " ") {
             return substr($this->responseLines, 0, 3);
@@ -99,9 +80,9 @@ class MailProtocolReceiver {
         
         return null;
     }
-    
-    protected function definesLogin($login) {
-        $this->login = $login;
+
+    function getServer() {
+        return $this->server;
     }
 
     private function resolvesOptions(array $options) {
@@ -111,7 +92,7 @@ class MailProtocolReceiver {
     }
 
     private function getResponse() {
-        $this->responseLines = fgets($this->socket);
+        $this->responseLines = fgets($this->streaming);
         return $this->responseLines;
     }
 
@@ -119,7 +100,7 @@ class MailProtocolReceiver {
         $lines = '';
 
         do {
-            stream_set_timeout($this->socket, 1);
+            stream_set_timeout($this->streaming, 1);
             $serverResponse = $this->getResponse();
             $lines .= $serverResponse;
         } while ($serverResponse !== false);
