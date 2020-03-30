@@ -23,10 +23,10 @@ class Receiver extends MailProtocolReceiver {
         parent::__construct($server, $port, $options);
         
         $this->recipients = [];
-        $this->header = array(
+        $this->header = [
             'To' => '',
             'Content-Type' => 'text/html; charset=UTF-8'
-        );
+        ];
 
         $this->definesLogin($sender);
         $this->sender = "MAIL FROM:<$sender>";
