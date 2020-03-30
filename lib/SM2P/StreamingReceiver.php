@@ -3,18 +3,17 @@
 namespace SM2P;
 
 use
-    Exception,
-    ArrayObject
+    Exception
 ;
 
 // Receiver
 class StreamingReceiver {
 
     protected $streaming;
-    
-//     private $command;
 
     private $responses;
+    
+    private $responseCodes;
     
     private $server;
     
@@ -24,9 +23,10 @@ class StreamingReceiver {
 
     function __construct($server, $port, array $options = []) {
         $this->server = $server;
-        $this->resolvesOptions($options);
         
-        $this->responses = new ArrayObject();
+        $this->resolvesOptions($options);
+
+        $this->responses = [];
         
         try {
             $errNum = null;
@@ -83,19 +83,15 @@ class StreamingReceiver {
     }
 
     function getResponseCode($index) {
-        $responses = $this->responses->getArrayCopy()[0];
-        if (array_key_exists($index, $responses)) {
-            $responseLine = $responses[$index];
-            if (strlen($responseLine) >= 4) {
-                return substr($responseLine, 0, 3);
-            }
+        if (array_key_exists($index, $this->responseCodes)) {
+            return $this->responseCodes[$index];
         }
         
         return null;
     }
     
     function getResponses() {
-        return $this->responses->getArrayCopy()[0];
+        return $this->responses;
     }
 
     function getServer() {
@@ -110,18 +106,11 @@ class StreamingReceiver {
 
     private function getResponse() {
         $response = fgets($this->streaming);
-        
-        if (isset($response) && gettype($response) === 'string' && strlen($response) > 1) {
-//             removes EOL
-            $resolvedResponse = substr($response, 0, strlen($response) - 1);
-            
-            if ($this->responses->offsetExists(0)) {
-                $responses = $this->responses->offsetGet(0);
-                $this->responses->offsetSet(0, array_merge($responses, explode("\n", $resolvedResponse)));
-            } else {
-                $this->responses->append(explode("\n", $resolvedResponse));
-            }
-            
+
+        if (strlen($response) > 1) {
+            $responseWithoutEOL = substr($response, 0, strlen($response) - 1);
+            $this->responses[]= $responseWithoutEOL;
+            $this->responseCodes[]= substr($response, 0, 3);
         }
         
         return $response;
