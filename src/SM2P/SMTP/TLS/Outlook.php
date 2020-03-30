@@ -34,7 +34,7 @@ class Outlook extends SMTP {
         $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->receiver));
 
         $this->commandInvoker->execute(function($response) {
-            echo $response;
+             echo $response;
         });
         
 //         the extension openssl should be enabled, otherwise that will give "timeout"
@@ -58,7 +58,7 @@ class Outlook extends SMTP {
         $this->commandInvoker->addsCommand(new Streaming\QuitCommand($this->receiver));
 
         $this->commandInvoker->execute(function($response) {
-            echo $response;
+             echo $response;
         });
 
         $this->receiver->closesConnection();

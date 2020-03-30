@@ -17,7 +17,8 @@ class CommandInvoker {
 
     function addsCommand(AbstractMailProtocolCommand $command) {
         $this->commands[]= $command;
-        $this->history[]= $command;
+        
+//         $this->history[]= $command;
     }
     
     function execute($callback = null) {
@@ -27,13 +28,13 @@ class CommandInvoker {
 //        caso em que poderá ser tentado executá-lo novamente
        if(isset($callback)) {
            foreach($this->commands as $command) {
-               $this->executedCommandHistory[]= $command;
+//                $this->executedCommandHistory[]= $command;
                
-               $responseLine = $command->execute();
+               $responseLines = $command->execute();
                
-               $lines .= $responseLine;
+               $lines .= $responseLines;
                
-               $callback($responseLine);
+               $callback($responseLines);
            }
        } else {
            foreach($this->commands as $command) {
