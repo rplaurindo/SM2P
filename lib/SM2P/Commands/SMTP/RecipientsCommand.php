@@ -18,13 +18,13 @@ class RecipientsCommand extends AbstractMailProtocolCommand {
     }
 
     function execute() {
-        $responses = [];
+        $responseLines = '';
         
         foreach ($this->recipients as $recipient) {
-            $responses[] = $this->receiver->sendCommand($recipient);
+            $responseLines .= $this->receiver->sendCommand($recipient);
         }
         
-        return implode("", $responses);
+        return $responseLines;
     }
 
 }

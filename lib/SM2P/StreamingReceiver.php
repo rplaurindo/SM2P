@@ -3,13 +3,18 @@
 namespace SM2P;
 
 use
-    Exception
+    Exception,
+    ArrayObject
 ;
 
 // Receiver
 class StreamingReceiver {
 
     protected $streaming;
+    
+//     private $command;
+
+    private $responses;
     
     private $server;
     
@@ -18,12 +23,14 @@ class StreamingReceiver {
     private $timeout = 10;
 
     function __construct($server, $port, array $options = []) {
+        $this->server = $server;
         $this->resolvesOptions($options);
+        
+        $this->responses = new ArrayObject();
         
         try {
             $errNum = null;
             $errStr = null;
-            $this->server = $server;
             
             $this->streaming = @stream_socket_client("$server:$port", $errNum, $errStr, $this->timeout);
             
@@ -39,6 +46,8 @@ class StreamingReceiver {
 
 //    action
     function sendCommand($command, array $options = []) {
+        
+        $this->command = $command;
         
         if (!array_key_exists('appendsEOL', $options)) {
             $options['appendsEOL'] = true;
@@ -73,12 +82,20 @@ class StreamingReceiver {
         fclose($this->streaming);
     }
 
-    function getLastResponseCode() {
-        if (strlen($this->responseLines) >= 4 && $this->responseLines[3] == " ") {
-            return substr($this->responseLines, 0, 3);
+    function getResponseCode($index) {
+        $responses = $this->responses->getArrayCopy()[0];
+        if (array_key_exists($index, $responses)) {
+            $responseLine = $responses[$index];
+            if (strlen($responseLine) >= 4) {
+                return substr($responseLine, 0, 3);
+            }
         }
         
         return null;
+    }
+    
+    function getResponses() {
+        return $this->responses->getArrayCopy()[0];
     }
 
     function getServer() {
@@ -92,8 +109,22 @@ class StreamingReceiver {
     }
 
     private function getResponse() {
-        $this->responseLines = fgets($this->streaming);
-        return $this->responseLines;
+        $response = fgets($this->streaming);
+        
+        if (isset($response) && gettype($response) === 'string' && strlen($response) > 1) {
+//             removes EOL
+            $resolvedResponse = substr($response, 0, strlen($response) - 1);
+            
+            if ($this->responses->offsetExists(0)) {
+                $responses = $this->responses->offsetGet(0);
+                $this->responses->offsetSet(0, array_merge($responses, explode("\n", $resolvedResponse)));
+            } else {
+                $this->responses->append(explode("\n", $resolvedResponse));
+            }
+            
+        }
+        
+        return $response;
     }
 
     private function eachLine() {

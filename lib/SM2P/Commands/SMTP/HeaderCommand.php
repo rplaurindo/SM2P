@@ -18,12 +18,13 @@ class HeaderCommand extends AbstractMailProtocolCommand {
     }
 
     function execute() {
-        $this->receiver->sendCommand('DATA');
+        $responseLines = $this->receiver->sendCommand('DATA');
         
         foreach($this->header as $key => $value) {
-            $this->receiver->sendCommand("$key: $value");
+            $responseLines .= $this->receiver->sendCommand("$key: $value");
         }
         
+        return $responseLines;
     }
 
 }

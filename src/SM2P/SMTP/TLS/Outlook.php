@@ -29,13 +29,9 @@ class Outlook extends SMTP {
     }
 
     function send() {
-        $sent = false;
-        
         $this->commandInvoker->addsCommand(new EHLOCommand($this->receiver));
         
         $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->receiver));
-
-//         echo $this->commandInvoker->execute();
 
         $this->commandInvoker->execute(function($response) {
             echo $response;
@@ -58,21 +54,16 @@ class Outlook extends SMTP {
         $this->commandInvoker->addsCommand(new HeaderCommand($this->receiver, $this->getHeader()));
 
         $this->commandInvoker->addsCommand(new BodyCommand($this->receiver, $this->getBody()));
-        
-        if ($this->receiver->getLastResponseCode() === '250') {
-            $sent = true;
-        }
 
         $this->commandInvoker->addsCommand(new Streaming\QuitCommand($this->receiver));
 
-//         echo $this->commandInvoker->execute();
         $this->commandInvoker->execute(function($response) {
             echo $response;
         });
 
         $this->receiver->closesConnection();
-
-        if ($sent) {
+        
+        if ($this->receiver->getResponseCode(count($this->receiver->getResponses()) - 2) === '250') {
             return true;
         }
         

@@ -18,11 +18,11 @@ class BodyCommand extends AbstractMailProtocolCommand {
     }
 
     function execute() {
-        $lines = $this->receiver->sendCommand(PHP_EOL, ['appendsEOL' => false]);
-        $lines .= $this->receiver->sendCommand($this->body);
-        $lines .= $this->receiver->sendCommand('.');
+        $responseLines = $this->receiver->sendCommand(PHP_EOL, ['appendsEOL' => false]);
+        $responseLines .= $this->receiver->sendCommand($this->body);
+        $responseLines .= $this->receiver->sendCommand('.');
         
-        return $lines;
+        return $responseLines;
     }
 
 }

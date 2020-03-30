@@ -8,7 +8,7 @@ use
 class QuitCommand extends AbstractMailProtocolCommand {
 
     function execute() {
-        $this->receiver->sendCommand('QUIT');
+        return $this->receiver->sendCommand('QUIT');
     }
 
 }
