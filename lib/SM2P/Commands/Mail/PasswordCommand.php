@@ -2,16 +2,19 @@
 
 namespace SM2P\Commands\Mail;
 
-use SM2P;
+use
+    SM2P\AbstractMailProtocolCommand,
+    SM2P\StreamingReceiver
+;
 
-class PasswordCommand extends SM2P\AbstractMailProtocolCommand {
+class PasswordCommand extends AbstractMailProtocolCommand {
 
     private $password;
 
-    function __construct(SM2P\MailProtocolReceiver $receiver) {
+    function __construct(StreamingReceiver $receiver, $password) {
         parent::__construct($receiver);
 
-        $this->password = $receiver->getPassword();
+        $this->password = $password;
     }
 
     function execute() {

@@ -3,16 +3,26 @@
 namespace SM2P\Commands\SMTP;
 
 use
-    SM2P\AbstractMailProtocolCommand;
+    SM2P\AbstractMailProtocolCommand,
+    SM2P\StreamingReceiver
+;
 
 class BodyCommand extends AbstractMailProtocolCommand {
+    
+    private $body;
+    
+    function __construct(StreamingReceiver $receiver, $body) {
+        parent::__construct($receiver);
+        
+        $this->body = $body;
+    }
 
     function execute() {
-        $lines = $this->receiver->sendCommand(PHP_EOL, ['appendsEOL' => false]);
-        $lines .= $this->receiver->sendCommand($this->receiver->getBody());
-        $lines .= $this->receiver->sendCommand('.');
+        $responseLines = $this->receiver->sendCommand(PHP_EOL, ['appendsEOL' => false]);
+        $responseLines .= $this->receiver->sendCommand($this->body);
+        $responseLines .= $this->receiver->sendCommand('.');
         
-        return $lines;
+        return $responseLines;
     }
 
 }

@@ -1,51 +1,37 @@
 <?php
 
-namespace SM2P\SMTP\ClientProxies\TLS;
+namespace SM2P\SMTP\TLS;
 
 use
     SM2P\CommandInvoker,
     SM2P\Commands\Mail,
-    SM2P\Commands\SMTP,
+    SM2P\Commands\SMTP\BodyCommand,
+    SM2P\Commands\SMTP\EHLOCommand,
+    SM2P\Commands\SMTP\HeaderCommand,
+    SM2P\Commands\SMTP\RecipientsCommand,
+    SM2P\Commands\SMTP\SenderCommand,
     SM2P\Commands\Streaming,
-    SM2P\SMTP\Receiver;
+    SM2P\SMTP,
+    SM2P\StreamingReceiver
+;
 
-// Command Client Proxy
-class Outlook {
+class Outlook extends SMTP {
     
     private $receiver;
 
     private $commandInvoker;
 
     function __construct($sender, array $options = []) {
-        $this->receiver = new Receiver('smtp.office365.com', 587, $sender, $options);
+        parent::__construct($sender, $options);
+        $this->receiver = new StreamingReceiver('smtp.office365.com', 587, $options);
         
         $this->commandInvoker = new CommandInvoker();
     }
-    
-    function definesPassword($password) {
-        $this->receiver->definesPassword($password);
-    }
-    
-    function addsTo($recipient, $name='') {
-        $this->receiver->addsTo($recipient, $name);
-    }
-    
-    function definesSubject($subject) {
-        $this->receiver->definesSubject($subject);
-    }
-    
-    function definesBody($body) {
-        $this->receiver->definesBody($body);
-    }
 
     function send() {
-        $sent = false;
-        
-        $this->commandInvoker->addsCommand(new SMTP\EHLOCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new EHLOCommand($this->receiver));
         
         $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->receiver));
-
-//         echo $this->commandInvoker->execute();
 
         $this->commandInvoker->execute(function($response) {
             echo $response;
@@ -56,33 +42,28 @@ class Outlook {
             echo "The connection stream has been encrypted.\n";
         }
         
-        $this->commandInvoker->addsCommand(new SMTP\EHLOCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new EHLOCommand($this->receiver));
 
-        $this->commandInvoker->addsCommand(new Mail\AuthLoginCommand($this->receiver));
-        $this->commandInvoker->addsCommand(new Mail\PasswordCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new Mail\AuthLoginCommand($this->receiver, $this->getLogin()));
+        $this->commandInvoker->addsCommand(new Mail\PasswordCommand($this->receiver, $this->getPassword()));
         
-        $this->commandInvoker->addsCommand(new SMTP\SenderCommand($this->receiver));
-        $this->commandInvoker->addsCommand(new SMTP\RecipientsCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new SenderCommand($this->receiver, $this->getSender()));
+        $this->commandInvoker->addsCommand(new RecipientsCommand($this->receiver, $this->getRecipients()));
         
 //         defines To, Content-Type and Subject
-        $this->commandInvoker->addsCommand(new SMTP\HeaderCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new HeaderCommand($this->receiver, $this->getHeader()));
 
-        $this->commandInvoker->addsCommand(new SMTP\BodyCommand($this->receiver));
-        
-        if ($this->receiver->getLastResponseCode() === '250') {
-            $sent = true;
-        }
+        $this->commandInvoker->addsCommand(new BodyCommand($this->receiver, $this->getBody()));
 
         $this->commandInvoker->addsCommand(new Streaming\QuitCommand($this->receiver));
 
-//         echo $this->commandInvoker->execute();
         $this->commandInvoker->execute(function($response) {
             echo $response;
         });
 
         $this->receiver->closesConnection();
-
-        if ($sent) {
+        
+        if ($this->receiver->getResponseCode(count($this->receiver->getResponses()) - 2) === '250') {
             return true;
         }
         

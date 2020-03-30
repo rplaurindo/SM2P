@@ -3,57 +3,51 @@
 namespace SM2P;
 
 use
-    Exception;
+    Exception,
+    ArrayObject
+;
 
 // Receiver
-class MailProtocolReceiver {
-    
-    private $responseLines;
+class StreamingReceiver {
 
-    private $login;
+    protected $streaming;
     
-    private $password;
+//     private $command;
 
-    private $socket;
+    private $responses;
     
     private $server;
+    
+    private $responseLines;
     
     private $timeout = 10;
 
     function __construct($server, $port, array $options = []) {
+        $this->server = $server;
         $this->resolvesOptions($options);
-
+        
+        $this->responses = new ArrayObject();
+        
         try {
             $errNum = null;
             $errStr = null;
-            $this->server = $server;
-
-            $this->socket = @stream_socket_client("$server:$port", $errNum, $errStr, $this->timeout);
+            
+            $this->streaming = @stream_socket_client("$server:$port", $errNum, $errStr, $this->timeout);
             
             if (isset($errNum)) {
                 throw new Exception($errStr);
             }
-
+            
             $this->getResponse();
         } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
-    
-    function definesPassword($password) {
-        $this->password = $password;
-    }
-    
-    function getLogin() {
-        return $this->login;
-    }
-    
-    function getPassword() {
-        return $this->password;
-    }
 
 //    action
     function sendCommand($command, array $options = []) {
+        
+        $this->command = $command;
         
         if (!array_key_exists('appendsEOL', $options)) {
             $options['appendsEOL'] = true;
@@ -65,7 +59,7 @@ class MailProtocolReceiver {
         }
         
 //         echo "\n$command";
-        fputs($this->socket, $command);
+        fputs($this->streaming, $command);
         
         if (!array_key_exists('hasManyLines', $options)) {
             $options['hasManyLines'] = false;
@@ -76,32 +70,36 @@ class MailProtocolReceiver {
 //             eachLine already calls getResponse() to defines lines
             return $this->responseLines;
         }
-
+        
         return $this->getResponse();
     }
-    
-    function getServer() {
-        return $this->server;
-    }
-    
+
     function encryptConnection($cryptoType = STREAM_CRYPTO_METHOD_TLS_CLIENT) {
-        return stream_socket_enable_crypto($this->socket, true, $cryptoType);
+        return stream_socket_enable_crypto($this->streaming, true, $cryptoType);
     }
-    
+
     function closesConnection() {
-        return fclose($this->socket);
+        fclose($this->streaming);
     }
-    
-    function getLastResponseCode() {
-        if (strlen($this->responseLines) >= 4 && $this->responseLines[3] == " ") {
-            return substr($this->responseLines, 0, 3);
+
+    function getResponseCode($index) {
+        $responses = $this->responses->getArrayCopy()[0];
+        if (array_key_exists($index, $responses)) {
+            $responseLine = $responses[$index];
+            if (strlen($responseLine) >= 4) {
+                return substr($responseLine, 0, 3);
+            }
         }
         
         return null;
     }
     
-    protected function definesLogin($login) {
-        $this->login = $login;
+    function getResponses() {
+        return $this->responses->getArrayCopy()[0];
+    }
+
+    function getServer() {
+        return $this->server;
     }
 
     private function resolvesOptions(array $options) {
@@ -111,15 +109,29 @@ class MailProtocolReceiver {
     }
 
     private function getResponse() {
-        $this->responseLines = fgets($this->socket);
-        return $this->responseLines;
+        $response = fgets($this->streaming);
+        
+        if (isset($response) && gettype($response) === 'string' && strlen($response) > 1) {
+//             removes EOL
+            $resolvedResponse = substr($response, 0, strlen($response) - 1);
+            
+            if ($this->responses->offsetExists(0)) {
+                $responses = $this->responses->offsetGet(0);
+                $this->responses->offsetSet(0, array_merge($responses, explode("\n", $resolvedResponse)));
+            } else {
+                $this->responses->append(explode("\n", $resolvedResponse));
+            }
+            
+        }
+        
+        return $response;
     }
 
     private function eachLine() {
         $lines = '';
 
         do {
-            stream_set_timeout($this->socket, 1);
+            stream_set_timeout($this->streaming, 1);
             $serverResponse = $this->getResponse();
             $lines .= $serverResponse;
         } while ($serverResponse !== false);

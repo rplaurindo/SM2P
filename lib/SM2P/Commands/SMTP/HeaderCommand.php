@@ -3,18 +3,28 @@
 namespace SM2P\Commands\SMTP;
 
 use
-    SM2P\AbstractMailProtocolCommand;
+    SM2P\AbstractMailProtocolCommand,
+    SM2P\StreamingReceiver
+;
 
 class HeaderCommand extends AbstractMailProtocolCommand {
+    
+    private $header;
+    
+    function __construct(StreamingReceiver $receiver, $header) {
+        parent::__construct($receiver);
+        
+        $this->header = $header;
+    }
 
     function execute() {
-        $this->receiver->sendCommand('DATA');
-        $header = $this->receiver->getHeader();
+        $responseLines = $this->receiver->sendCommand('DATA');
         
-        foreach($header as $key => $value) {
-            $this->receiver->sendCommand("$key: $value");
+        foreach($this->header as $key => $value) {
+            $responseLines .= $this->receiver->sendCommand("$key: $value");
         }
         
+        return $responseLines;
     }
 
 }

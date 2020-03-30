@@ -1,11 +1,8 @@
 <?php
 
-namespace SM2P\SMTP;
+namespace SM2P;
 
-use
-    SM2P\MailProtocolReceiver;
-
-class Receiver extends MailProtocolReceiver {
+class SMTP extends MailProtocol {
 
     private $sender;
     
@@ -19,14 +16,12 @@ class Receiver extends MailProtocolReceiver {
 
     private $recipients = [];
 
-    function __construct($server, $port, $sender, array $options = []) {
-        parent::__construct($server, $port, $options);
-        
+    function __construct($sender, array $options = []) {
         $this->recipients = [];
-        $this->header = array(
+        $this->header = [
             'To' => '',
             'Content-Type' => 'text/html; charset=UTF-8'
-        );
+        ];
 
         $this->definesLogin($sender);
         $this->sender = "MAIL FROM:<$sender>";
@@ -51,19 +46,19 @@ class Receiver extends MailProtocolReceiver {
         $this->body = $body;
     }
 
-    function getSender() {
+    protected function getSender() {
         return $this->sender;
     }
 
-    function getRecipients() {
+    protected function getRecipients() {
         return $this->recipients;
     }
 
-    function getHeader() {
+    protected function getHeader() {
         return $this->header;
     }
 
-    function getBody() {
+    protected function getBody() {
         return $this->body;
     }
     
