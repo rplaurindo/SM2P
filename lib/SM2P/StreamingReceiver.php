@@ -107,7 +107,7 @@ class StreamingReceiver {
     private function getResponse() {
         $response = fgets($this->streaming);
 
-        if (strlen($response) > 1) {
+        if (gettype($response) === 'string' && !empty($response)) {
             $responseWithoutEOL = substr($response, 0, strlen($response) - 1);
             $this->responses[]= $responseWithoutEOL;
             $this->responseCodes[]= substr($response, 0, 3);
