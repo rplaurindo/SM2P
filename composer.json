@@ -2,7 +2,7 @@
   "name": "rplaurindo/sm2p",
   "version": "1.0.0",
   "homepage": "https://github.com/rplaurindo/sm2p",
-  "description": "A Simple Mail for PHP.",
+  "description": "A mail sender for PHP.",
   "type": "library",
   "license": "MIT",
   "authors": [
