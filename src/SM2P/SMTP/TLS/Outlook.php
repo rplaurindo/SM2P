@@ -10,9 +10,9 @@ use
     SM2P\Commands\SMTP\HeaderCommand,
     SM2P\Commands\SMTP\RecipientsCommand,
     SM2P\Commands\SMTP\SenderCommand,
-    SM2P\Commands\Streaming,
+    SM2P\Commands\Streaming\QuitCommand,
     SM2P\SMTP,
-    SM2P\StreamingReceiver
+    SM2P\Streaming
 ;
 
 class Outlook extends SMTP {
@@ -23,7 +23,7 @@ class Outlook extends SMTP {
 
     function __construct($sender, array $options = []) {
         parent::__construct($sender, $options);
-        $this->receiver = new StreamingReceiver('smtp.office365.com', 587, $options);
+        $this->receiver = new Streaming('smtp.office365.com', 587, $options);
         
         $this->commandInvoker = new CommandInvoker();
     }
@@ -55,7 +55,7 @@ class Outlook extends SMTP {
 
         $this->commandInvoker->addsCommand(new BodyCommand($this->receiver, $this->getBody()));
 
-        $this->commandInvoker->addsCommand(new Streaming\QuitCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new QuitCommand($this->receiver));
 
         $this->commandInvoker->execute(function($response) {
              echo $response;

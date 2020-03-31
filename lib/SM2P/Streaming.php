@@ -7,7 +7,7 @@ use
 ;
 
 // Receiver
-class StreamingReceiver {
+class Streaming {
 
     protected $streaming;
 

@@ -7,7 +7,7 @@ abstract class AbstractMailProtocolCommand {
 
     protected $receiver;
 
-    function __construct(StreamingReceiver $receiver) {
+    function __construct(Streaming $receiver) {
         $this->receiver = $receiver;
     }
 

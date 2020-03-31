@@ -4,14 +4,14 @@ namespace SM2P\Commands\SMTP;
 
 use
     SM2P\AbstractMailProtocolCommand,
-    SM2P\StreamingReceiver
+    SM2P\Streaming
 ;
 
 class RecipientsCommand extends AbstractMailProtocolCommand {
     
     private $recipients;
     
-    function __construct(StreamingReceiver $receiver, $recipients) {
+    function __construct(Streaming $receiver, $recipients) {
         parent::__construct($receiver);
         
         $this->recipients = $recipients;

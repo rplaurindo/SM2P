@@ -4,7 +4,7 @@ namespace SM2P\Commands\Mail;
 
 use
     SM2P\AbstractMailProtocolCommand,
-    SM2P\StreamingReceiver
+    SM2P\Streaming
 ;
 
 // Concrete Command
@@ -12,7 +12,7 @@ class AuthLoginCommand extends AbstractMailProtocolCommand {
 
     private $login;
 
-    function __construct(StreamingReceiver $receiver, $login) {
+    function __construct(Streaming $receiver, $login) {
         parent::__construct($receiver);
 
         $this->login = $login;
