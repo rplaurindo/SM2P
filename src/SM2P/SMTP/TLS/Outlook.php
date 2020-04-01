@@ -1,6 +1,6 @@
 <?php
 
-namespace SM2P\SMTP\Clients\TLS;
+namespace SM2P\Clients\SMTP\TLS;
 
 use
     SM2P\CommandInvoker,
