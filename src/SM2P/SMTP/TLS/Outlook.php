@@ -12,7 +12,7 @@ use
     SM2P\Commands\SMTP\SenderCommand,
     SM2P\Commands\Streaming\QuitCommand,
     SM2P\SMTP,
-    SM2P\Streaming
+    SM2P\CommandReceiver
 ;
 
 class Outlook extends SMTP {
@@ -23,7 +23,7 @@ class Outlook extends SMTP {
 
     function __construct($sender, array $options = []) {
         parent::__construct($sender, $options);
-        $this->streaming = new Streaming('smtp.office365.com', 587, $options);
+        $this->streaming = new CommandReceiver('smtp.office365.com', 587, $options);
         
         $this->commandInvoker = new CommandInvoker();
     }
