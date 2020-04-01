@@ -2,7 +2,7 @@
 
 require 'autoload.php';
 
-use SM2P\SMTP\TLS\Outlook;
+use SM2P\Clients\SMTP\TLS\Outlook;
 
 $smtp = new Outlook('');
 
