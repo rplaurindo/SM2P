@@ -22,11 +22,11 @@ class Streaming {
     private $timeout = 10;
 
     function __construct($server, $port, array $options = []) {
-        $this->server = $server;
-        
         $this->resolvesOptions($options);
-
+        
+        $this->server = $server;
         $this->responses = [];
+        $this->responseCodes = [];
         
         try {
             $errNum = null;

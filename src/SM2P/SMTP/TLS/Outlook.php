@@ -17,53 +17,53 @@ use
 
 class Outlook extends SMTP {
     
-    private $receiver;
+    private $streaming;
 
     private $commandInvoker;
 
     function __construct($sender, array $options = []) {
         parent::__construct($sender, $options);
-        $this->receiver = new Streaming('smtp.office365.com', 587, $options);
+        $this->streaming = new Streaming('smtp.office365.com', 587, $options);
         
         $this->commandInvoker = new CommandInvoker();
     }
 
     function send() {
-        $this->commandInvoker->addsCommand(new EHLOCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new EHLOCommand($this->streaming));
         
-        $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new Mail\StartTLSCommand($this->streaming));
 
         $this->commandInvoker->execute(function($response) {
              echo $response;
         });
         
 //         the extension openssl should be enabled, otherwise that will give "timeout"
-        if ($this->receiver->encryptConnection()) {
+        if ($this->streaming->encryptConnection()) {
             echo "The connection stream has been encrypted.\n";
         }
         
-        $this->commandInvoker->addsCommand(new EHLOCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new EHLOCommand($this->streaming));
 
-        $this->commandInvoker->addsCommand(new Mail\AuthLoginCommand($this->receiver, $this->getLogin()));
-        $this->commandInvoker->addsCommand(new Mail\PasswordCommand($this->receiver, $this->getPassword()));
+        $this->commandInvoker->addsCommand(new Mail\AuthLoginCommand($this->streaming, $this->getLogin()));
+        $this->commandInvoker->addsCommand(new Mail\PasswordCommand($this->streaming, $this->getPassword()));
         
-        $this->commandInvoker->addsCommand(new SenderCommand($this->receiver, $this->getSender()));
-        $this->commandInvoker->addsCommand(new RecipientsCommand($this->receiver, $this->getRecipients()));
+        $this->commandInvoker->addsCommand(new SenderCommand($this->streaming, $this->getSender()));
+        $this->commandInvoker->addsCommand(new RecipientsCommand($this->streaming, $this->getRecipients()));
         
 //         defines To, Content-Type and Subject
-        $this->commandInvoker->addsCommand(new HeaderCommand($this->receiver, $this->getHeader()));
+        $this->commandInvoker->addsCommand(new HeaderCommand($this->streaming, $this->getHeader()));
 
-        $this->commandInvoker->addsCommand(new BodyCommand($this->receiver, $this->getBody()));
+        $this->commandInvoker->addsCommand(new BodyCommand($this->streaming, $this->getBody()));
 
-        $this->commandInvoker->addsCommand(new QuitCommand($this->receiver));
+        $this->commandInvoker->addsCommand(new QuitCommand($this->streaming));
 
         $this->commandInvoker->execute(function($response) {
              echo $response;
         });
 
-        $this->receiver->closesConnection();
+        $this->streaming->closesConnection();
         
-        if ($this->receiver->getResponseCode(count($this->receiver->getResponses()) - 2) === '250') {
+        if ($this->streaming->getResponseCode(count($this->streaming->getResponses()) - 2) === '250') {
             return true;
         }
         
