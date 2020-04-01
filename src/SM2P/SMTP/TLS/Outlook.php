@@ -15,6 +15,7 @@ use
     SM2P\CommandReceiver
 ;
 
+// Client
 class Outlook extends SMTP {
     
     private $streaming;
